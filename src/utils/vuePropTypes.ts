@@ -34,6 +34,7 @@ class VuePropTypes extends createTypes(createParams) {
   }
 }
 
+/** vue-types类型工具 */
 export const propTypes = VuePropTypes;
 
 export default VuePropTypes;

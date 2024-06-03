@@ -12,6 +12,7 @@ export function toGoogleAuth(clientId: string, redirectUri: string) {
   isEdgeBrowser() ? window.open(url, '_self') : (window.location.href = url);
 }
 
+/** 谷歌身份检查 */
 const GoogleAuth = defineComponent({
   name: 'GoogleAuth',
   toGoogleAuth,

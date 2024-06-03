@@ -44,6 +44,7 @@ export function getTelegramAuthUrlParams() {
   return false;
 }
 
+/** Telegram身份检查 */
 const TelegramAuth = defineComponent({
   name: 'TelegramAuth',
   toTelegramAuth,

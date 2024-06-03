@@ -1,5 +1,7 @@
+/** 时区项类型 */
 export type TimeZoneItem = { label: string; enLabel: string; value: string; tzNum: number };
 
+/** 时区列表 */
 export const timeZoneOptions: TimeZoneItem[] = [
   {
     label: '(UTC-12:00) 国际日期变更线西',

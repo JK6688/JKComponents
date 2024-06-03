@@ -1,10 +1,15 @@
 import { createVNode, nextTick } from 'vue';
-import { isHtmlStr, isString } from './is';
+import * as is from './is';
+import * as propTypes from './vuePropTypes';
+import * as timeZone from './timeZone';
+import * as withInstall from './withInstall';
 
 export * from './is';
 export * from './vuePropTypes';
 export * from './timeZone';
 export * from './withInstall';
+
+export const utils = { is, propTypes, timeZone, withInstall };
 
 export function evalPro(str: string) {
   try {
@@ -63,7 +68,7 @@ export function generateHandleInputFn<T extends object, K extends keyof T>(
 
 /** 渲染Html字符串片段 */
 export function renderHtmlStr(html: string) {
-  if (!isString(html) || !isHtmlStr(html)) return html;
+  if (!is.isString(html) || !is.isHtmlStr(html)) return html;
   return createVNode('div', { innerHTML: html });
 }
 
