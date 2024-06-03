@@ -23,10 +23,10 @@ export default defineConfig({
       entry: {
         index: 'src/index.tsx',
       },
-      name: 'JKComponent',
+      name: 'JKComps',
       fileName: (format, entryName) => {
         const fileName = entryName.split('/').pop()?.replace('.ts', '');
-        return `jk-component.${fileName}.${format}.js`;
+        return `jk-comps.${fileName}.${format}.js`;
       },
     },
     rollupOptions: {

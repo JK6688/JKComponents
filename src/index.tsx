@@ -6,8 +6,8 @@ import * as utils from './utils';
 export * from './components';
 export * from './utils';
 
-const JKComponent = { ...components, ...utils };
+const JKComps = { ...components, ...utils };
 
-export default JKComponent;
+export default JKComps;
 
 createApp(defineComponent(() => () => <div>App.tsx</div>)).mount('#app');

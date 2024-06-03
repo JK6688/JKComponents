@@ -1,3 +1,3 @@
-# jk-components
+# jk-comps
 
-npm install jk-components
+npm install jk-comps
