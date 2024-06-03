@@ -1,5 +1,5 @@
 import { defineComponent, onMounted, ref } from 'vue';
-import { propTypes } from '@/utils/propTypes';
+import { propTypes } from '@/utils/vuePropTypes';
 import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
 
 /** 跳转谷歌身份检查 */

@@ -2,7 +2,7 @@ import { createVNode, nextTick } from 'vue';
 import { isHtmlStr, isString } from './is';
 
 export * from './is';
-export * from './propTypes';
+export * from './vuePropTypes';
 export * from './timeZone';
 export * from './withInstall';
 
