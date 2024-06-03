@@ -6,8 +6,8 @@ import * as utils from './utils';
 export * from './components';
 export * from './utils';
 
-const JKComps = { ...components, ...utils };
+const JKVUEComps = { ...components, ...utils };
 
-export default JKComps;
+export default JKVUEComps;
 
 createApp(defineComponent(() => () => <div>App.tsx</div>)).mount('#app');

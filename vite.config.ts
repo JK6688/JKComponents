@@ -23,10 +23,10 @@ export default defineConfig({
       entry: {
         index: 'src/index.tsx',
       },
-      name: 'JKComps',
+      name: 'JKVUEComps',
       fileName: (format, entryName) => {
         const fileName = entryName.split('/').pop()?.replace('.ts', '');
-        return `jk-comps.${fileName}.${format}.js`;
+        return `jk-vue-comps.${fileName}.${format}.js`;
       },
     },
     rollupOptions: {

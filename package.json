@@ -1,25 +1,27 @@
 {
-  "name": "jk-comps",
+  "name": "jk-vue-comps",
   "version": "1.0.0",
-  "description": "jk-comps",
+  "description": "jk-vue-comps",
   "type": "module",
-  "main": "dist/jk-comps.index.umd.js",
-  "module": "dist/jk-comps.index.es.js",
+  "main": "dist/jk-vue-comps.index.umd.js",
+  "module": "dist/jk-vue-comps.index.es.js",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/jk-comps.index.es.js",
-      "require": "./dist/jk-comps.index.umd.js"
+      "import": "./dist/jk-vue-comps.index.es.js",
+      "require": "./dist/jk-vue-comps.index.umd.js"
     }
   },
   "keywords": [
     "vite5",
     "vue3",
     "tsx",
-    "JK"
+    "JK",
+    "TelegramAuth",
+    "GoogleAuth"
   ],
   "scripts": {
     "dev": "vite",
