@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
 import { withInstall } from '@/utils/withInstall';
@@ -24,6 +24,9 @@ const Google = defineComponent({
     callback: (_data: { code: string }) => true,
     rejectCallback: (_data: any) => true,
   },
+  slots: Object as SlotsType<{
+    default: { startCheck: () => void };
+  }>,
   setup(props, { emit, slots }) {
     const googleAuthDomRef = ref<HTMLElement | null>(null);
 
@@ -58,20 +61,18 @@ const Google = defineComponent({
       })?.requestCode?.();
     }
 
-    onMounted(setupScript);
+    function setDomRef(el: HTMLElement) {
+      googleAuthDomRef.value = el;
+      setupScript();
+    }
 
-    const renderFn = () => (
-      <div ref="googleAuthDomRef">{!isHidden.value && slots?.default?.({ startCheck })}</div>
-    );
-
-    return { googleAuthDomRef, renderFn, startCheck };
+    return () => <div ref={setDomRef}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
   },
-  render: (self: { renderFn: () => JSX.Element }) => self.renderFn(),
 });
 
-/** 谷歌身份检查 */
-export const GoogleAuth = withInstall(Google);
+type C = typeof Google & { readonly toGoogleAuth: typeof toGoogleAuth };
 
-export default GoogleAuth as typeof GoogleAuth & {
-  readonly toGoogleAuth: typeof toGoogleAuth;
-};
+/** 谷歌身份检查 */
+export const GoogleAuth = withInstall<C>(Google as C);
+
+export default GoogleAuth;

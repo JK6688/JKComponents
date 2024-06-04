@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { getWebsiteUrl, isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
 
@@ -55,6 +55,9 @@ const Telegram = defineComponent({
     callback: (_user: TgUserData) => true,
     rejectCallback: () => true,
   },
+  slots: Object as SlotsType<{
+    default: { startCheck: () => void };
+  }>,
   setup(props, { emit, slots }) {
     const telegramAuthDomRef = ref<HTMLElement | null>(null);
 
@@ -82,19 +85,21 @@ const Telegram = defineComponent({
       });
     }
 
-    onMounted(setupScript);
+    function setDomRef(el: HTMLElement) {
+      telegramAuthDomRef.value = el;
+      setupScript();
+    }
 
-    const renderFn = () => <div ref="telegramAuthDomRef">{slots?.default?.({ startCheck })}</div>;
-
-    return { telegramAuthDomRef, renderFn, startCheck };
+    return () => <div ref={setDomRef}>{slots?.default?.({ startCheck })}</div>;
   },
-  render: (self: { renderFn: () => JSX.Element }) => self.renderFn(),
 });
 
-/** Telegram身份检查 */
-export const TelegramAuth = withInstall(Telegram);
-
-export default TelegramAuth as typeof TelegramAuth & {
+type C = typeof Telegram & {
   readonly toTelegramAuth: typeof toTelegramAuth;
   readonly getTelegramAuthUrlParams: typeof getTelegramAuthUrlParams;
 };
+
+/** Telegram身份检查 */
+export const TelegramAuth = withInstall<C>(Telegram as C);
+
+export default TelegramAuth;
