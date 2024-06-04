@@ -9,7 +9,7 @@ export * from './vuePropTypes';
 export * from './timeZone';
 export * from './withInstall';
 
-export const utils = { is, propTypes, timeZone, withInstall };
+export const Utils = { is, propTypes, timeZone, withInstall };
 
 export function evalPro(str: string) {
   try {
