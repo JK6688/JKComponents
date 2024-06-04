@@ -28,13 +28,11 @@ const Google = defineComponent({
     default: { startCheck: () => void };
   }>,
   setup(props, { emit, slots }) {
-    const googleAuthDomRef = ref<HTMLElement | null>(null);
-
     const isHidden = ref(true);
 
     const getClientFn = () => (window as any)?.google?.accounts?.oauth2?.initCodeClient;
 
-    function setupScript() {
+    function setupScript(el: HTMLElement) {
       if (!window?.document || getClientFn()) {
         if (getClientFn()) isHidden.value = false;
         return;
@@ -43,7 +41,7 @@ const Google = defineComponent({
       script.async = true;
       script.defer = true;
       script.src = 'https://accounts.google.com/gsi/client';
-      googleAuthDomRef.value?.appendChild?.(script);
+      el?.appendChild?.(script);
       script.onload = () => {
         if (getClientFn()) isHidden.value = false;
       };
@@ -61,12 +59,7 @@ const Google = defineComponent({
       })?.requestCode?.();
     }
 
-    function setDomRef(el: HTMLElement) {
-      googleAuthDomRef.value = el;
-      setupScript();
-    }
-
-    return () => <div ref={setDomRef}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
+    return () => <div ref={setupScript}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
   },
 });
 

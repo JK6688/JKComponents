@@ -59,17 +59,15 @@ const Telegram = defineComponent({
     default: { startCheck: () => void };
   }>,
   setup(props, { emit, slots }) {
-    const telegramAuthDomRef = ref<HTMLElement | null>(null);
-
     const getClientFn = () => (window as any)?.Telegram?.Login?.auth;
 
-    function setupScript() {
+    function setupScript(el: HTMLElement) {
       if (!window?.document || getClientFn() || isInMobileBrowser()) return;
       const script = document.createElement('script');
       script.async = true;
       script.defer = true;
       script.src = 'https://telegram.org/js/telegram-widget.js';
-      telegramAuthDomRef.value?.appendChild?.(script);
+      el?.appendChild?.(script);
     }
 
     function startCheck() {
@@ -85,12 +83,7 @@ const Telegram = defineComponent({
       });
     }
 
-    function setDomRef(el: HTMLElement) {
-      telegramAuthDomRef.value = el;
-      setupScript();
-    }
-
-    return () => <div ref={setDomRef}>{slots?.default?.({ startCheck })}</div>;
+    return () => <div ref={setupScript}>{slots?.default?.({ startCheck })}</div>;
   },
 });
 
