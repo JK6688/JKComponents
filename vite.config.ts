@@ -19,20 +19,23 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    rollupOptions: {
-      input: {
+    lib: {
+      entry: {
         index: 'src/index.tsx',
         'utils/is': 'src/utils/is.ts',
         'utils/propTypes': 'src/utils/vuePropTypes.ts',
         'utils/timeZone': 'src/utils/timeZone.ts',
         'utils/withInstall': 'src/utils/withInstall.ts',
       },
+      fileName: (module) => `${module.indexOf('utils/') === 0 ? 'utils/' : ''}[name].js`,
+      formats: ['es'],
+    },
+    rollupOptions: {
+      external: ['vue', 'vue-types'],
       output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'style.css') return 'assets/[name]-[hash][extname]';
-          return 'assets/[name]-[hash][extname]';
+        globals: {
+          vue: 'Vue',
+          'vue-types': 'VueTypes',
         },
         chunkFileNames: (chunkInfo) => {
           if (chunkInfo.name.indexOf('utils/') === 0) {
@@ -40,13 +43,6 @@ export default defineConfig({
           } else {
             return 'chunks/[name]-[hash].js';
           }
-        },
-        entryFileNames: (chunk) => {
-          const parts = chunk.name.split('/');
-          if (parts.length > 1 && parts[0] === 'utils') {
-            return `utils/${parts.pop()}.js`;
-          }
-          return `${parts.pop()}.js`;
         },
       },
     },
