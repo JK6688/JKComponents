@@ -1,6 +1,7 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
+import { withInstall } from '@/utils/withInstall';
 
 /** 跳转谷歌身份检查 */
 export function toGoogleAuth(clientId: string, redirectUri: string) {
@@ -12,8 +13,7 @@ export function toGoogleAuth(clientId: string, redirectUri: string) {
   isEdgeBrowser() ? window.open(url, '_self') : (window.location.href = url);
 }
 
-/** 谷歌身份检查 */
-const GoogleAuth = defineComponent({
+const Google = defineComponent({
   name: 'GoogleAuth',
   toGoogleAuth,
   props: {
@@ -68,6 +68,9 @@ const GoogleAuth = defineComponent({
   },
   render: (self: { renderFn: () => JSX.Element }) => self.renderFn(),
 });
+
+/** 谷歌身份检查 */
+export const GoogleAuth = withInstall(Google);
 
 export default GoogleAuth as typeof GoogleAuth & {
   readonly toGoogleAuth: typeof toGoogleAuth;

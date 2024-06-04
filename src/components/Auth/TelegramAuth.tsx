@@ -1,7 +1,6 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
-import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
-import { getWebsiteUrl } from '@/utils';
+import { getWebsiteUrl, isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
 
 /** tg用户信息 */
 export type TgUserData = {
@@ -44,8 +43,7 @@ export function getTelegramAuthUrlParams() {
   return false;
 }
 
-/** Telegram身份检查 */
-const TelegramAuth = defineComponent({
+const Telegram = defineComponent({
   name: 'TelegramAuth',
   toTelegramAuth,
   getTelegramAuthUrlParams,
@@ -92,6 +90,9 @@ const TelegramAuth = defineComponent({
   },
   render: (self: { renderFn: () => JSX.Element }) => self.renderFn(),
 });
+
+/** Telegram身份检查 */
+export const TelegramAuth = withInstall(Telegram);
 
 export default TelegramAuth as typeof TelegramAuth & {
   readonly toTelegramAuth: typeof toTelegramAuth;
