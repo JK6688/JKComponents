@@ -23,13 +23,13 @@ export default defineConfig({
       name: 'JKVUEComps',
       entry: {
         index: 'src/index.tsx',
-        // 'utils/is': 'src/utils/is.ts',
-        // 'utils/propTypes': 'src/utils/vuePropTypes.ts',
-        // 'utils/timeZone': 'src/utils/timeZone.ts',
-        // 'utils/withInstall': 'src/utils/withInstall.ts',
+        'utils/is': 'src/utils/is.ts',
+        'utils/propTypes': 'src/utils/vuePropTypes.ts',
+        'utils/timeZone': 'src/utils/timeZone.ts',
+        'utils/withInstall': 'src/utils/withInstall.ts',
       },
       fileName: (module) => `${module.indexOf('utils/') === 0 ? 'utils/' : ''}[name].js`,
-      formats: ['es', 'umd'],
+      formats: ['es'],
     },
     rollupOptions: {
       external: ['vue', 'vue-types'],
