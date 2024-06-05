@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
+import { defineComponent, h, onMounted, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
 import { withInstall } from '@/utils/withInstall';
@@ -65,9 +65,11 @@ const Google = defineComponent({
 
     onMounted(setupScript);
 
-    return () => (
-      <div ref={googleAuthDomRef}>{!isHidden.value && slots?.default?.({ startCheck })}</div>
-    );
+    // return () => (
+    //   <div ref={googleAuthDomRef}>{!isHidden.value && slots?.default?.({ startCheck })}</div>
+    // );
+    return () =>
+      h('div', { ref: googleAuthDomRef }, !isHidden.value && slots?.default?.({ startCheck }));
   },
 });
 

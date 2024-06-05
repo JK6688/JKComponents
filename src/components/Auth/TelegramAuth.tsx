@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
+import { defineComponent, h, onMounted, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { getWebsiteUrl, isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
 
@@ -89,7 +89,9 @@ const Telegram = defineComponent({
 
     onMounted(setupScript);
 
-    return () => <div ref={telegramAuthDomRef}>{slots?.default?.({ startCheck })}</div>;
+    // return () => <div ref={telegramAuthDomRef}>{slots?.default?.({ startCheck })}</div>;
+
+    return () => h('div', { ref: telegramAuthDomRef }, slots?.default?.({ startCheck }));
   },
 });
 
