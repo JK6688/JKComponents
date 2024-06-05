@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "jk-vue-comps",
   "type": "module",
   "main": "dist/index.js",
