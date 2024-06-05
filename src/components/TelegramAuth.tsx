@@ -92,7 +92,11 @@ const Telegram = defineComponent({
 
     onMounted(setupScript);
 
-    return () => <div id={domId}>{slots?.default?.({ startCheck })}</div>;
+    return { domId, startCheck };
+  },
+  render() {
+    const { domId, startCheck, $slots } = this;
+    return <div id={domId}>{$slots?.default?.({ startCheck })}</div>;
   },
 });
 

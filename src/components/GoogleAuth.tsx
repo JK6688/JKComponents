@@ -67,7 +67,11 @@ const Google = defineComponent({
 
     onMounted(setupScript);
 
-    return () => <div id={domId}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
+    return { domId, isHidden, startCheck };
+  },
+  render() {
+    const { domId, isHidden, startCheck, $slots } = this;
+    return <div id={domId}>{!isHidden && $slots?.default?.({ startCheck })}</div>;
   },
 });
 
