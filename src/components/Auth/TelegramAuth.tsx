@@ -1,4 +1,4 @@
-import { defineComponent, ref, type SlotsType } from 'vue';
+import { defineComponent, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { getWebsiteUrl, isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
 
