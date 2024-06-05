@@ -1,2 +1,2 @@
-export * from './Auth/GoogleAuth';
-export * from './Auth/TelegramAuth';
+export * from './GoogleAuth';
+export * from './TelegramAuth';

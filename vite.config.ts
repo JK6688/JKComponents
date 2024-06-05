@@ -3,6 +3,18 @@ import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import typescript from '@rollup/plugin-typescript';
 
+function fileName(name: string, type: 'hash' | 'name' = 'name') {
+  let prefix = '';
+  if (name.indexOf('utils/') === 0) {
+    prefix = 'utils/';
+  } else if (name.indexOf('components/') === 0) {
+    prefix = 'components/';
+  } else if (type === 'hash') {
+    prefix = 'chunks/';
+  }
+  return `${prefix}[name]${type === 'hash' ? '-[hash]' : ''}.js`;
+}
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -27,8 +39,10 @@ export default defineConfig({
         'utils/propTypes': 'src/utils/vuePropTypes.ts',
         'utils/timeZone': 'src/utils/timeZone.ts',
         'utils/withInstall': 'src/utils/withInstall.ts',
+        'components/GoogleAuth': 'src/components/GoogleAuth.tsx',
+        'components/TelegramAuth': 'src/components/TelegramAuth.tsx',
       },
-      fileName: (module) => `${module.indexOf('utils/') === 0 ? 'utils/' : ''}[name].js`,
+      fileName: (module) => fileName(module, 'name'),
       formats: ['es'],
     },
     rollupOptions: {
@@ -39,13 +53,7 @@ export default defineConfig({
           vue: 'Vue',
           'vue-types': 'VueTypes',
         },
-        chunkFileNames: (chunkInfo) => {
-          if (chunkInfo.name.indexOf('utils/') === 0) {
-            return 'utils/[name]-[hash].js';
-          } else {
-            return 'chunks/[name]-[hash].js';
-          }
-        },
+        chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash'),
       },
     },
   },
