@@ -1,4 +1,4 @@
-import { defineComponent, nextTick, onMounted, ref, type SlotsType } from 'vue';
+import { defineComponent, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
 import { withInstall } from '@/utils/withInstall';
@@ -28,26 +28,9 @@ const Google = defineComponent({
     default: { startCheck: () => void };
   }>,
   setup(props, { emit, slots, expose }) {
-    const googleAuthDomRef = ref<HTMLElement | null>(null);
-
     const isHidden = ref(true);
 
     const getClientFn = () => (window as any)?.google?.accounts?.oauth2?.initCodeClient;
-
-    function setupScript() {
-      if (!window?.document || getClientFn()) {
-        if (getClientFn()) isHidden.value = false;
-        return;
-      }
-      const script = document.createElement('script');
-      script.async = true;
-      script.defer = true;
-      script.src = 'https://accounts.google.com/gsi/client';
-      googleAuthDomRef.value?.appendChild?.(script);
-      script.onload = () => {
-        if (getClientFn()) isHidden.value = false;
-      };
-    }
 
     function startCheck() {
       getClientFn()?.({
@@ -63,13 +46,22 @@ const Google = defineComponent({
 
     expose({ startCheck });
 
-    onMounted(() => {
-      nextTick().then(setupScript);
-    });
+    function setupScript(el: HTMLElement) {
+      if (!window?.document || getClientFn()) {
+        if (getClientFn()) isHidden.value = false;
+        return;
+      }
+      const script = document.createElement('script');
+      script.async = true;
+      script.defer = true;
+      script.src = 'https://accounts.google.com/gsi/client';
+      el?.appendChild?.(script);
+      script.onload = () => {
+        if (getClientFn()) isHidden.value = false;
+      };
+    }
 
-    return () => (
-      <div ref={googleAuthDomRef}>{!isHidden.value && slots?.default?.({ startCheck })}</div>
-    );
+    return () => <div ref={setupScript}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
   },
 });
 
