@@ -1,7 +1,7 @@
 import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
-import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
-import { withInstall } from '@/utils/withInstall';
+import { isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
+import { useDomId } from '@/hooks/useDomId';
 
 /** 跳转谷歌身份检查 */
 export function toGoogleAuth(clientId: string, redirectUri: string) {
@@ -28,7 +28,7 @@ const Google = defineComponent({
     default: { startCheck: () => void };
   }>,
   setup(props, { emit, slots, expose }) {
-    const googleAuthDomRef = ref<HTMLElement | null>(null);
+    const domId = useDomId('google-auth');
 
     const isHidden = ref(true);
 
@@ -53,11 +53,13 @@ const Google = defineComponent({
         if (getClientFn()) isHidden.value = false;
         return;
       }
+      const dom = document.getElementById(domId);
+      if (!dom) return;
       const script = document.createElement('script');
       script.async = true;
       script.defer = true;
       script.src = 'https://accounts.google.com/gsi/client';
-      googleAuthDomRef.value?.appendChild?.(script);
+      dom.appendChild(script);
       script.onload = () => {
         if (getClientFn()) isHidden.value = false;
       };
@@ -65,9 +67,7 @@ const Google = defineComponent({
 
     onMounted(setupScript);
 
-    return () => (
-      <div ref={googleAuthDomRef}>{!isHidden.value && slots?.default?.({ startCheck })}</div>
-    );
+    return () => <div id={domId}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
   },
 });
 
