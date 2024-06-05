@@ -59,7 +59,7 @@ const Telegram = defineComponent({
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit, slots, expose }) {
+  setup(props, { emit }) {
     const domId = useDomId('telegram-auth');
 
     const getClientFn = () => (window as any)?.Telegram?.Login?.auth;
@@ -76,8 +76,6 @@ const Telegram = defineComponent({
         data ? emit('callback', data) : emit('rejectCallback');
       });
     }
-
-    expose({ startCheck });
 
     function setupScript() {
       if (!window?.document || getClientFn() || isInMobileBrowser()) return;

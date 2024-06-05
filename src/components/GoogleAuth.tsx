@@ -27,7 +27,7 @@ const Google = defineComponent({
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit, slots, expose }) {
+  setup(props, { emit }) {
     const domId = useDomId('google-auth');
 
     const isHidden = ref(true);
@@ -45,8 +45,6 @@ const Google = defineComponent({
         },
       })?.requestCode?.();
     }
-
-    expose({ startCheck });
 
     function setupScript() {
       if (!window?.document || getClientFn()) {
