@@ -1,4 +1,4 @@
-import { defineComponent, type SlotsType } from 'vue';
+import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { getWebsiteUrl, isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
 
@@ -58,16 +58,18 @@ const Telegram = defineComponent({
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit, slots }) {
+  setup(props, { emit }) {
+    const telegramAuthDomRef = ref<HTMLElement | null>(null);
+
     const getClientFn = () => (window as any)?.Telegram?.Login?.auth;
 
-    function setupScript(el: HTMLElement) {
+    function setupScript() {
       if (!window?.document || getClientFn() || isInMobileBrowser()) return;
       const script = document.createElement('script');
       script.async = true;
       script.defer = true;
       script.src = 'https://telegram.org/js/telegram-widget.js';
-      el?.appendChild?.(script);
+      telegramAuthDomRef.value?.appendChild?.(script);
     }
 
     function startCheck() {
@@ -83,7 +85,13 @@ const Telegram = defineComponent({
       });
     }
 
-    return () => <div ref={setupScript}>{slots?.default?.({ startCheck })}</div>;
+    onMounted(setupScript);
+
+    return { telegramAuthDomRef, startCheck };
+  },
+  render() {
+    const { startCheck, $slots } = this;
+    return <div ref="telegramAuthDomRef">{$slots?.default?.({ startCheck })}</div>;
   },
 });
 

@@ -10,6 +10,4 @@ export default JKVUEComps;
 
 // import { defineComponent, createApp } from 'vue';
 
-// createApp(defineComponent(() => () => <comps.TelegramAuth>App.tsx</comps.TelegramAuth>)).mount(
-//   '#app',
-// );
+// createApp(defineComponent(() => () => <comps.GoogleAuth>App.tsx</comps.GoogleAuth>)).mount('#app');

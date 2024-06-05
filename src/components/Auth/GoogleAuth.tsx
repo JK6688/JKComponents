@@ -1,4 +1,4 @@
-import { defineComponent, ref, type SlotsType } from 'vue';
+import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import { isInMobileBrowser, isEdgeBrowser } from '@/utils/is';
 import { withInstall } from '@/utils/withInstall';
@@ -27,12 +27,14 @@ const Google = defineComponent({
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit, slots }) {
+  setup(props, { emit }) {
+    const googleAuthDomRef = ref<HTMLElement | null>(null);
+
     const isHidden = ref(true);
 
     const getClientFn = () => (window as any)?.google?.accounts?.oauth2?.initCodeClient;
 
-    function setupScript(el: HTMLElement) {
+    function setupScript() {
       if (!window?.document || getClientFn()) {
         if (getClientFn()) isHidden.value = false;
         return;
@@ -41,7 +43,7 @@ const Google = defineComponent({
       script.async = true;
       script.defer = true;
       script.src = 'https://accounts.google.com/gsi/client';
-      el?.appendChild?.(script);
+      googleAuthDomRef.value?.appendChild?.(script);
       script.onload = () => {
         if (getClientFn()) isHidden.value = false;
       };
@@ -59,7 +61,13 @@ const Google = defineComponent({
       })?.requestCode?.();
     }
 
-    return () => <div ref={setupScript}>{!isHidden.value && slots?.default?.({ startCheck })}</div>;
+    onMounted(setupScript);
+
+    return { googleAuthDomRef, isHidden, startCheck };
+  },
+  render() {
+    const { isHidden, startCheck, $slots } = this;
+    return <div ref="googleAuthDomRef">{!isHidden && $slots?.default?.({ startCheck })}</div>;
   },
 });
 
