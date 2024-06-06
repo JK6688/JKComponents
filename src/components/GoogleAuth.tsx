@@ -8,9 +8,13 @@ export function toGoogleAuth(clientId: string, redirectUri: string) {
   if (!clientId || !redirectUri) return;
   const routerUrl = encodeURIComponent(redirectUri);
   const scope = encodeURIComponent('email profile');
-  const client_id = encodeURIComponent(clientId);
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=${routerUrl}&scope=${scope}&client_id=${client_id}`;
-  isEdgeBrowser() ? window.open(url, '_self') : (window.location.href = url);
+  const _clientId = encodeURIComponent(clientId);
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=${routerUrl}&scope=${scope}&client_id=${_clientId}`;
+  if (isEdgeBrowser()) {
+    window.open(url, '_self');
+  } else {
+    window.location.href = url;
+  }
 }
 
 const Google = defineComponent({
@@ -21,8 +25,8 @@ const Google = defineComponent({
     redirectUri: propTypes.string,
   },
   emits: {
-    callback: (_data: { code: string }) => true,
-    rejectCallback: (_data: any) => true,
+    callback: (_data: { code: string }) => true || _data,
+    rejectCallback: (_data: any) => true || _data,
   },
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
@@ -41,7 +45,11 @@ const Google = defineComponent({
         redirect_uri: props.redirectUri,
         ux_mode: isInMobileBrowser() ? 'redirect' : 'popup',
         callback(data: any) {
-          data.error ? emit('rejectCallback', data) : emit('callback', data);
+          if (data.error) {
+            emit('rejectCallback', data);
+          } else {
+            emit('callback', data);
+          }
         },
       })?.requestCode?.();
     }

@@ -1,7 +1,5 @@
-const toString = Object.prototype.toString;
-
 export function is(val: unknown, type: string) {
-  return toString.call(val) === `[object ${type}]`;
+  return Object.prototype.toString.call(val) === `[object ${type}]`;
 }
 
 /** 是否undefined */
@@ -17,23 +15,6 @@ export function isUnDef<T = unknown>(val?: T): val is T {
 /** 是否对象  */
 export function isObject(val: any): val is Record<any, any> {
   return val !== null && is(val, 'Object');
-}
-
-/** 是否空 */
-export function isEmpty<T = unknown>(val: T): val is T {
-  if (isArray(val) || isString(val)) {
-    return val.length === 0;
-  }
-
-  if (val instanceof Map || val instanceof Set) {
-    return val.size === 0;
-  }
-
-  if (isObject(val)) {
-    return Object.keys(val).length === 0;
-  }
-
-  return false;
 }
 
 /** 是否Date */
@@ -61,16 +42,6 @@ export function isNumber(val: unknown): val is number {
   return is(val, 'Number');
 }
 
-/** 是否Promise */
-export function isPromise<T = any>(val: unknown): val is Promise<T> {
-  return is(val, 'Promise') && isObject(val) && isFunction(val.then) && isFunction(val.catch);
-}
-
-/** 是否PromiseLink */
-export function isPromiseLink<T>(it: T | PromiseLike<T>): it is PromiseLike<T> {
-  return it instanceof Promise || typeof (it as any)?.then === 'function';
-}
-
 /** 是否字符串 */
 export function isString(val: unknown): val is string {
   return is(val, 'String');
@@ -94,6 +65,33 @@ export function isRegExp(val: unknown): val is RegExp {
 /** 是否数组 */
 export function isArray(val: any): val is Array<any> {
   return val && Array.isArray(val);
+}
+
+/** 是否空 */
+export function isEmpty<T = unknown>(val: T): val is T {
+  if (isArray(val) || isString(val)) {
+    return val.length === 0;
+  }
+
+  if (val instanceof Map || val instanceof Set) {
+    return val.size === 0;
+  }
+
+  if (isObject(val)) {
+    return Object.keys(val).length === 0;
+  }
+
+  return false;
+}
+
+/** 是否Promise */
+export function isPromise<T = any>(val: unknown): val is Promise<T> {
+  return is(val, 'Promise') && isObject(val) && isFunction(val.then) && isFunction(val.catch);
+}
+
+/** 是否PromiseLink */
+export function isPromiseLink<T>(it: T | PromiseLike<T>): it is PromiseLike<T> {
+  return it instanceof Promise || typeof (it as any)?.then === 'function';
 }
 
 /** 是否Window */
@@ -166,11 +164,11 @@ export function isZhLang(lang: string) {
 export function isEdgeBrowser() {
   if (navigator.userAgent.indexOf('Edge') > -1) {
     return true;
-  } else if (((navigator as any)?.userAgentData?.brands?.length ?? 0) > 0) {
-    for (let i = 0; i < (navigator as any)?.userAgentData?.brands?.length; i++) {
-      if ((navigator as any).userAgentData.brands[i].brand === 'Microsoft Edge') {
-        return true;
-      }
+  }
+  const brands = (navigator as any)?.userAgentData?.brands ?? [];
+  for (const item of brands) {
+    if (item?.brand === 'Microsoft Edge') {
+      return true;
     }
   }
   return false;

@@ -13,7 +13,8 @@ export const Utils = { is, propTypes, timeZone, withInstall };
 
 export function evalPro(str: string) {
   try {
-    return Function(`'use strict'; return (${str});`)();
+    const func = new Function(`'use strict'; return (${str});`);
+    return func();
   } catch {
     return null;
   }
@@ -36,8 +37,8 @@ export function filterInputNum(
     if (type === 'int') {
       val = val.indexOf('0') === 0 && val.length > 1 ? val.substring(0, val.length - 1) : val;
     } else {
-      const req1 = evalPro('/' + '\\.{' + maxDecimal + ',}/g');
-      const req2 = evalPro('/^(' + '\\d?)+(' + '\\.' + '\\d{0,' + maxDecimal + '})?$/');
+      const req1 = evalPro(`/\\.{${maxDecimal},}/g`);
+      const req2 = evalPro(`/^(\\d?)+(\\.\\d{0,${maxDecimal}})?$/`);
       if (val.indexOf('.') === 0) {
         val = '';
         val = val.replace(/[^$#$]/g, '0.');
