@@ -22,13 +22,13 @@ export default defineConfig({
     typescript({
       declaration: true,
       emitDeclarationOnly: true,
-      outDir: 'dist/types',
-    }),
+      outDir: 'dist/types'
+    })
   ],
   resolve: {
     alias: {
-      '@': '/src',
-    },
+      '@': '/src'
+    }
   },
   build: {
     lib: {
@@ -40,10 +40,10 @@ export default defineConfig({
         'utils/timeZone': 'src/utils/timeZone.ts',
         'utils/withInstall': 'src/utils/withInstall.ts',
         'components/GoogleAuth': 'src/components/GoogleAuth.tsx',
-        'components/TelegramAuth': 'src/components/TelegramAuth.tsx',
+        'components/TelegramAuth': 'src/components/TelegramAuth.tsx'
       },
       fileName: (module) => fileName(module, 'name'),
-      formats: ['es'],
+      formats: ['es']
     },
     rollupOptions: {
       external: ['vue', 'vue-types'],
@@ -51,10 +51,10 @@ export default defineConfig({
         exports: 'named',
         globals: {
           vue: 'Vue',
-          'vue-types': 'VueTypes',
+          'vue-types': 'VueTypes'
         },
-        chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash'),
-      },
-    },
-  },
+        chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash')
+      }
+    }
+  }
 });

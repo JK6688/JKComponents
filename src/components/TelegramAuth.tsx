@@ -1,6 +1,11 @@
 import { defineComponent, onMounted, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
-import { getWebsiteUrl, isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
+import {
+  getWebsiteUrl,
+  isInMobileBrowser,
+  isEdgeBrowser,
+  withInstall
+} from '@/utils';
 import { useDomId } from '@/hooks/useDomId';
 
 /** tg用户信息 */
@@ -52,11 +57,11 @@ const Telegram = defineComponent({
   getTelegramAuthUrlParams,
   props: {
     botId: propTypes.number,
-    toPath: propTypes.string,
+    toPath: propTypes.string
   },
   emits: {
     callback: (_user: TgUserData) => true || _user,
-    rejectCallback: () => true,
+    rejectCallback: () => true
   },
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
@@ -74,13 +79,16 @@ const Telegram = defineComponent({
         toTelegramAuth(botId, toPath);
         return;
       }
-      clientFn?.({ bot_id: botId, request_access: true }, (data: TgUserData) => {
-        if (data) {
-          emit('callback', data);
-        } else {
-          emit('rejectCallback');
+      clientFn?.(
+        { bot_id: botId, request_access: true },
+        (data: TgUserData) => {
+          if (data) {
+            emit('callback', data);
+          } else {
+            emit('rejectCallback');
+          }
         }
-      });
+      );
     }
 
     function setupScript() {
@@ -101,7 +109,7 @@ const Telegram = defineComponent({
   render() {
     const { domId, startCheck, $slots } = this;
     return <div id={domId}>{$slots?.default?.({ startCheck })}</div>;
-  },
+  }
 });
 
 type C = typeof Telegram & {

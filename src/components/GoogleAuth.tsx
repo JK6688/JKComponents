@@ -22,11 +22,11 @@ const Google = defineComponent({
   toGoogleAuth,
   props: {
     clientId: propTypes.string,
-    redirectUri: propTypes.string,
+    redirectUri: propTypes.string
   },
   emits: {
     callback: (_data: { code: string }) => true || _data,
-    rejectCallback: (_data: any) => true || _data,
+    rejectCallback: (_data: any) => true || _data
   },
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
@@ -36,7 +36,8 @@ const Google = defineComponent({
 
     const isHidden = ref(true);
 
-    const getClientFn = () => (window as any)?.google?.accounts?.oauth2?.initCodeClient;
+    const getClientFn = () =>
+      (window as any)?.google?.accounts?.oauth2?.initCodeClient;
 
     function startCheck() {
       getClientFn()?.({
@@ -50,7 +51,7 @@ const Google = defineComponent({
           } else {
             emit('callback', data);
           }
-        },
+        }
       })?.requestCode?.();
     }
 
@@ -77,8 +78,10 @@ const Google = defineComponent({
   },
   render() {
     const { domId, isHidden, startCheck, $slots } = this;
-    return <div id={domId}>{!isHidden && $slots?.default?.({ startCheck })}</div>;
-  },
+    return (
+      <div id={domId}>{!isHidden && $slots?.default?.({ startCheck })}</div>
+    );
+  }
 });
 
 type C = typeof Google & { readonly toGoogleAuth: typeof toGoogleAuth };

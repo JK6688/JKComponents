@@ -1,7 +1,17 @@
 {
   "semi": true,
-  "trailingComma": "all",
+  "endOfLine": "auto",
   "singleQuote": true,
-  "printWidth": 100,
-  "tabWidth": 2
+  "trailingComma": "none",
+  "bracketSpacing": true,
+  "vueIndentScriptAndStyle": false,
+  "htmlWhitespaceSensitivity": "ignore",
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "html"
+      }
+    }
+  ]
 }

@@ -23,19 +23,23 @@ export function evalPro(str: string) {
 export function filterInputNum(
   e: string | number,
   type: 'int' | 'float' = 'float',
-  maxDecimal = 6,
+  maxDecimal = 6
 ) {
   let val = String(e);
   val = val.replace(/(^\s*)|(\s*$)/g, '');
   if (val !== '') {
-    const cases = val.indexOf('0') === 0 && val.length > 1 && val.indexOf('.') !== 1;
+    const cases =
+      val.indexOf('0') === 0 && val.length > 1 && val.indexOf('.') !== 1;
     const reg = type === 'int' ? /[^\d]/g : /[^\d.]/g;
     val = val.replace(reg, '');
     if (cases) {
       return '0';
     }
     if (type === 'int') {
-      val = val.indexOf('0') === 0 && val.length > 1 ? val.substring(0, val.length - 1) : val;
+      val =
+        val.indexOf('0') === 0 && val.length > 1
+          ? val.substring(0, val.length - 1)
+          : val;
     } else {
       const req1 = evalPro(`/\\.{${maxDecimal},}/g`);
       const req2 = evalPro(`/^(\\d?)+(\\.\\d{0,${maxDecimal}})?$/`);
@@ -57,7 +61,7 @@ export function generateHandleInputFn<T extends object, K extends keyof T>(
   key: K,
   fn?: () => void,
   type: 'float' | 'int' = 'int',
-  maxDecimal = 6,
+  maxDecimal = 6
 ) {
   return (e: ChangeEvent) => {
     nextTick().then(() => {

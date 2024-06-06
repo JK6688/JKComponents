@@ -86,7 +86,12 @@ export function isEmpty<T = unknown>(val: T): val is T {
 
 /** 是否Promise */
 export function isPromise<T = any>(val: unknown): val is Promise<T> {
-  return is(val, 'Promise') && isObject(val) && isFunction(val.then) && isFunction(val.catch);
+  return (
+    is(val, 'Promise') &&
+    isObject(val) &&
+    isFunction(val.then) &&
+    isFunction(val.catch)
+  );
 }
 
 /** 是否PromiseLink */
@@ -128,7 +133,7 @@ export const isIp = (ip: string) => /\b(?:\d{1,3}.){3}\d{1,3}\b/.test(ip);
 /** 是否邮箱 */
 export const isEmail = (email: string) =>
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-    email,
+    email
   );
 
 /** 是否号码 */
@@ -148,7 +153,9 @@ export function isValidPhoneNumber(phoneNumber: string) {
 export function isInMobileBrowser() {
   return (
     typeof navigator !== 'undefined' &&
-    navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i)
+    navigator.userAgent.match(
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i
+    )
   );
 }
 

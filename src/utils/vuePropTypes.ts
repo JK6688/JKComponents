@@ -3,7 +3,7 @@ import * as VueTypes from 'vue-types';
 
 const { createTypes, toValidableType } = VueTypes;
 
-const defVal = undefined;
+const defVal = void 0;
 
 const createParams = {
   func: defVal,
@@ -11,7 +11,7 @@ const createParams = {
   string: defVal,
   number: defVal,
   object: defVal,
-  integer: defVal,
+  integer: defVal
 };
 
 class VuePropTypes extends createTypes(createParams) {
@@ -30,7 +30,7 @@ class VuePropTypes extends createTypes(createParams) {
   static get style() {
     return toValidableType<CSSProperties | string>('style', {
       type: [String, Object],
-      default: defVal,
+      default: defVal
     });
   }
 
