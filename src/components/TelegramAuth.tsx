@@ -1,4 +1,4 @@
-import { defineComponent, onMounted, type SlotsType } from 'vue';
+import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
 import { propTypes } from '@/utils/vuePropTypes';
 import {
   getWebsiteUrl,
@@ -6,7 +6,6 @@ import {
   isEdgeBrowser,
   withInstall
 } from '@/utils';
-import { useDomId } from '@/hooks/useDomId';
 
 /** tg用户信息 */
 export type TgUserData = {
@@ -33,21 +32,21 @@ export function toTelegramAuth(botId: number, toPath: string) {
 }
 
 /** 获取路由中的Telegram身份检查回调参数 */
-export function getTelegramAuthUrlParams() {
+export function getTelegramAuthUrlParams(): TgUserData | null {
   const re = /[#\?\&]tgAuthResult=([A-Za-z0-9\-_=]*)$/;
   try {
     const locationHash = window.location.hash.toString();
     const match = locationHash.match(re);
     if (!match) {
-      return false;
+      return null;
     }
     window.location.hash = locationHash.replace(re, '');
     let data = match[1].replace(/-/g, '+').replace(/_/g, '/');
     const pad = data.length % 4;
     if (pad > 1) data += new Array(5 - pad).join('=');
-    return data ? JSON.parse(window.atob(data)) : false;
+    return data ? JSON.parse(window.atob(data)) : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -66,8 +65,8 @@ const Telegram = defineComponent({
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit }) {
-    const domId = useDomId('telegram-auth');
+  setup(props, { emit, slots, expose }) {
+    const telegramAuthDomRef = ref<HTMLElement | null>(null);
 
     const getClientFn = () => (window as any)?.Telegram?.Login?.auth;
 
@@ -93,22 +92,20 @@ const Telegram = defineComponent({
 
     function setupScript() {
       if (!window?.document || getClientFn() || isInMobileBrowser()) return;
-      const dom = document.getElementById(domId);
-      if (!dom) return;
       const script = document.createElement('script');
       script.async = true;
       script.defer = true;
       script.src = 'https://telegram.org/js/telegram-widget.js';
-      dom.appendChild(script);
+      telegramAuthDomRef.value?.appendChild(script);
     }
 
     onMounted(setupScript);
 
-    return { domId, startCheck };
-  },
-  render() {
-    const { domId, startCheck, $slots } = this;
-    return <div id={domId}>{$slots?.default?.({ startCheck })}</div>;
+    expose({ startCheck });
+
+    return () => (
+      <div ref={telegramAuthDomRef}>{slots.default?.({ startCheck })}</div>
+    );
   }
 });
 

@@ -37,8 +37,7 @@ export default defineConfig({
     vueJsx(),
     typescript({
       declaration: true,
-      emitDeclarationOnly: true,
-      outDir: 'dist/types'
+      emitDeclarationOnly: true
     })
   ],
   resolve: {
