@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "1.1.4",
+  "version": "0.1.0",
   "description": "jk-vue-comps",
   "type": "module",
   "main": "dist/index.js",
@@ -13,6 +13,42 @@
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js",
+      "require": "./dist/components/index.js"
+    },
+    "./components/GoogleAuth": {
+      "import": "./dist/components/GoogleAuth.js",
+      "require": "./dist/components/GoogleAuth.js"
+    },
+    "./components/TelegramAuth": {
+      "import": "./dist/components/TelegramAuth.js",
+      "require": "./dist/components/TelegramAuth.js"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.js"
+    },
+    "./utils/is": {
+      "import": "./dist/utils/is.js",
+      "require": "./dist/utils/is.js"
+    },
+    "./utils/vuePropTypes": {
+      "import": "./dist/utils/vuePropTypes.js",
+      "require": "./dist/utils/vuePropTypes.js"
+    },
+    "./utils/timeZone": {
+      "import": "./dist/utils/timeZone.js",
+      "require": "./dist/utils/timeZone.js"
+    },
+    "./utils/withInstall": {
+      "import": "./dist/utils/withInstall.js",
+      "require": "./dist/utils/withInstall.js"
+    },
+    "./types": {
+      "import": "./dist/types/index.d.ts",
+      "require": "./dist/types/index.d.ts"
     }
   },
   "keywords": [

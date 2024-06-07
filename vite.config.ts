@@ -35,10 +35,12 @@ export default defineConfig({
       name: 'JKVUEComps',
       entry: {
         index: 'src/index.tsx',
+        'utils/index': 'src/utils/index.ts',
         'utils/is': 'src/utils/is.ts',
-        'utils/propTypes': 'src/utils/vuePropTypes.ts',
+        'utils/vuePropTypes': 'src/utils/vuePropTypes.ts',
         'utils/timeZone': 'src/utils/timeZone.ts',
         'utils/withInstall': 'src/utils/withInstall.ts',
+        'components/index': 'src/components/index.ts',
         'components/GoogleAuth': 'src/components/GoogleAuth.tsx',
         'components/TelegramAuth': 'src/components/TelegramAuth.tsx'
       },
