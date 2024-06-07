@@ -31,41 +31,43 @@ function fileName(name: string, type: 'hash' | 'name' = 'name') {
   return `${prefix}[name]${type === 'hash' ? '-[hash]' : ''}.js`;
 }
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    typescript({
-      declaration: true,
-      emitDeclarationOnly: true
-    })
-  ],
-  resolve: {
-    alias: {
-      '@': '/src'
-    }
-  },
-  build: {
-    lib: {
-      name: 'JKVUEComps',
-      entry: {
-        index: resolve(__dirname, 'src/index.tsx'),
-        ...getEntries('src/utils'),
-        ...getEntries('src/components')
-      },
-      fileName: (module) => fileName(module, 'name'),
-      formats: ['es']
+export default () => {
+  return defineConfig({
+    plugins: [
+      vue(),
+      vueJsx(),
+      typescript({
+        declaration: true,
+        emitDeclarationOnly: true
+      })
+    ],
+    resolve: {
+      alias: {
+        '@': '/src'
+      }
     },
-    rollupOptions: {
-      external: ['vue', 'vue-types'],
-      output: {
-        exports: 'named',
-        globals: {
-          vue: 'Vue',
-          'vue-types': 'VueTypes'
+    build: {
+      lib: {
+        name: 'JKVUEComps',
+        entry: {
+          index: resolve(__dirname, 'src/index.tsx'),
+          ...getEntries('src/utils'),
+          ...getEntries('src/components')
         },
-        chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash')
+        fileName: (module) => fileName(module, 'name'),
+        formats: ['es']
+      },
+      rollupOptions: {
+        external: ['vue', 'vue-types'],
+        output: {
+          exports: 'named',
+          globals: {
+            vue: 'Vue',
+            'vue-types': 'VueTypes'
+          },
+          chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash')
+        }
       }
     }
-  }
-});
+  });
+};

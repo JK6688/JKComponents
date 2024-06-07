@@ -3,18 +3,16 @@ import * as VueTypes from 'vue-types';
 
 const { createTypes, toValidableType } = VueTypes;
 
-const defVal = void 0;
+const defVal = undefined;
 
-const createParams = {
+class VuePropTypes extends createTypes({
   func: defVal,
   bool: defVal,
   string: defVal,
   number: defVal,
   object: defVal,
   integer: defVal
-};
-
-class VuePropTypes extends createTypes(createParams) {
+}) {
   static vueTypes = VueTypes;
 
   static anyType = VueTypes.any;
