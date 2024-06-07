@@ -2,6 +2,22 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import typescript from '@rollup/plugin-typescript';
+import { resolve } from 'path';
+import { readdirSync } from 'fs';
+
+function getEntries(url: string) {
+  const req = /\.(ts|tsx)$/;
+  const utilsDir = resolve(__dirname, url);
+  const files = readdirSync(utilsDir).filter((file) => req.test(file));
+
+  const folders = url.replace(/^src\//, '');
+
+  return files.reduce((acc: Record<string, string>, file) => {
+    const key = `${folders ? `${folders}/` : ''}${file.replace(req, '')}`;
+    acc[key] = resolve(utilsDir, file);
+    return acc;
+  }, {});
+}
 
 function fileName(name: string, type: 'hash' | 'name' = 'name') {
   let prefix = '';
@@ -34,15 +50,9 @@ export default defineConfig({
     lib: {
       name: 'JKVUEComps',
       entry: {
-        index: 'src/index.tsx',
-        'utils/index': 'src/utils/index.ts',
-        'utils/is': 'src/utils/is.ts',
-        'utils/vuePropTypes': 'src/utils/vuePropTypes.ts',
-        'utils/timeZone': 'src/utils/timeZone.ts',
-        'utils/withInstall': 'src/utils/withInstall.ts',
-        'components/index': 'src/components/index.ts',
-        'components/GoogleAuth': 'src/components/GoogleAuth.tsx',
-        'components/TelegramAuth': 'src/components/TelegramAuth.tsx'
+        index: resolve(__dirname, 'src/index.tsx'),
+        ...getEntries('src/utils'),
+        ...getEntries('src/components')
       },
       fileName: (module) => fileName(module, 'name'),
       formats: ['es']
