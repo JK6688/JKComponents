@@ -77,5 +77,11 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-types': 'off'
   },
-  ignorePatterns: ['node_modules/', 'dist/', '**/*.cjs', 'types/**/*.d.ts', 'vite.config.ts']
+  ignorePatterns: [
+    'node_modules/',
+    'dist/',
+    '**/*.cjs',
+    'types/**/*.d.ts',
+    'vite.config.ts'
+  ]
 };
