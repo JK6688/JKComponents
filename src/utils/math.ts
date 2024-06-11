@@ -6,6 +6,12 @@ export type BigNumValType = BigNumVal | undefined | null | boolean;
 
 export type BigNumObj = BJS;
 
+export const DOWN = BJS.ROUND_DOWN;
+
+export const UP = BJS.ROUND_UP;
+
+export const BigNumber = BJS;
+
 export function helper(val: BigNumValType): BigNumObj {
   if (isBool(val)) return BJS(~~val);
 
@@ -80,10 +86,6 @@ export function isGreaterThanOrEqualTo(num1: BigNumVal, num2: BigNumVal) {
 export function isLessThanOrEqualTo(num1: BigNumVal, num2: BigNumVal) {
   return helper(num1).isLessThanOrEqualTo(helper(num2));
 }
-
-const DOWN = BJS.ROUND_DOWN;
-
-const UP = BJS.ROUND_UP;
 
 /** 转为BigNumber对象 */
 export function toBigNum(val: BigNumValType) {
