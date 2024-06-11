@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "jk-vue-comps",
   "type": "module",
   "main": "dist/index.js",
@@ -40,15 +40,20 @@
       "require": "./dist/utils/is.js",
       "types": "./dist/utils/is.d.ts"
     },
-    "./dist/utils/vuePropTypes": {
-      "import": "./dist/utils/vuePropTypes.js",
-      "require": "./dist/utils/vuePropTypes.js",
-      "types": "./dist/utils/vuePropTypes.d.ts"
+    "./dist/utils/math": {
+      "import": "./dist/utils/math.js",
+      "require": "./dist/utils/math.js",
+      "types": "./dist/utils/math.d.ts"
     },
     "./dist/utils/timeZone": {
       "import": "./dist/utils/timeZone.js",
       "require": "./dist/utils/timeZone.js",
       "types": "./dist/utils/timeZone.d.ts"
+    },
+    "./dist/utils/vuePropTypes": {
+      "import": "./dist/utils/vuePropTypes.js",
+      "require": "./dist/utils/vuePropTypes.js",
+      "types": "./dist/utils/vuePropTypes.d.ts"
     },
     "./dist/utils/withInstall": {
       "import": "./dist/utils/withInstall.js",
@@ -74,7 +79,8 @@
   },
   "dependencies": {
     "vue": "^3.4.21",
-    "vue-types": "^5.1.2"
+    "vue-types": "^5.1.2",
+    "bignumber.js": "^9.1.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",

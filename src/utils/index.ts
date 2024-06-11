@@ -2,6 +2,7 @@ import { createVNode, nextTick } from 'vue';
 import * as is from './is';
 
 export * from './is';
+export * from './math';
 export * from './vuePropTypes';
 export * from './timeZone';
 export * from './withInstall';
@@ -143,7 +144,7 @@ export function desensitization(
     middleStr: '****'
   }
 ) {
-  if (!is.isString(str) || !is.isNumber(str)) return str;
+  if (!is.isString(str) && !is.isNumber(str)) return str;
   const val = String(str);
   const len = val?.length ?? 0;
   if (!val || !len || number <= 0) return val;

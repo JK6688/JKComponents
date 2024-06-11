@@ -41,10 +41,6 @@ export default () => {
         emitDeclarationOnly: true
       })
     ],
-    server: {
-      host: true,
-      port: 6666
-    },
     resolve: {
       alias: {
         '@': '/src'
