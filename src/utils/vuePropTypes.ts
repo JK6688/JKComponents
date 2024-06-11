@@ -26,8 +26,8 @@ class VuePropTypes extends createTypes({
   static funcType = VueTypes.func;
 
   static get style() {
-    return toValidableType<CSSProperties | string>('style', {
-      type: [String, Object],
+    return toValidableType<CSSProperties>('style', {
+      type: [Object],
       default: defVal
     });
   }
