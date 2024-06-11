@@ -1,10 +1,10 @@
 import { isFunction } from '@/utils/is';
 import type { Ref, ComputedRef } from 'vue';
 
-export function useFormKeypressEnter(
-  fn: (...args: any[]) => any,
-  loading: Ref<boolean> | ComputedRef<boolean> | (() => boolean)
-) {
+export function useFormKeypressEnter<
+  T extends (...args: any[]) => any,
+  L extends Ref<boolean> | ComputedRef<boolean> | (() => boolean)
+>(fn: T, loading: L) {
   return function (...args: any[]) {
     const isLoad = isFunction(loading) ? loading?.() : loading.value;
     if (!isLoad) {
