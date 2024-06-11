@@ -1,5 +1,6 @@
 import { createVNode, nextTick } from 'vue';
 import * as is from './is';
+import * as JKMath from './math';
 
 export * from './is';
 export * from './math';
@@ -65,7 +66,7 @@ export function filterInputNum(
  * @param maxDecimal 最大小数位，default: 6
  */
 export function generateFilterInputNumFn<
-  T extends Record<string, any>,
+  T extends Recordable,
   K extends keyof T
 >(
   obj: T,
@@ -151,4 +152,28 @@ export function desensitization(
   const prefix = options.showPrefix ? val.substring(0, number) : '';
   const suffix = options.showSuffix ? val.substring(len - number) : '';
   return `${prefix}${options.middleStr}${suffix}`;
+}
+
+/** 数字转为样式单位
+ * @param str 值
+ * @param unit 单位，default: 'px'
+ */
+export function toStyleUnit(str?: string | number | null, unit = 'px') {
+  if (str === null || str === '' || str === void 0) return void 0;
+  return JKMath.isNanValue(str) ? String(str) : `${JKMath.toNum(str)}${unit}`;
+}
+
+/** 数字转为样式对象 */
+export function toStyleObject(style?: string | Recordable | null) {
+  if (!style) return {};
+  if (is.isObject(style)) return style;
+  return style.split(';').reduce((obj, declaration) => {
+    const [property, value] = declaration.trim().split(':');
+    if (property) {
+      const name = property.trim();
+      const key = name.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
+      obj[key] = value.trim();
+    }
+    return obj;
+  }, {} as Recordable);
 }

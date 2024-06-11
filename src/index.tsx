@@ -1,12 +1,12 @@
 // import { defineComponent, createApp } from 'vue';
 
-import * as comps from './components';
-import * as utils from './utils';
+import * as Comps from './components';
+import * as Utils from './utils';
 
 export * from './components';
 export * from './utils';
 
-const JKVUEComps = { ...comps, ...utils, Utils: utils, Comps: comps };
+const JKVUEComps = { ...Comps, ...Utils, Utils, Comps };
 
 export default JKVUEComps;
 
