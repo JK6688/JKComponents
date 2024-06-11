@@ -5,6 +5,7 @@ import * as Hooks from './hooks';
 import * as Utils from './utils';
 
 export * from './components';
+export * from './hooks';
 export * from './utils';
 
 const JKVUEComps = { ...Comps, ...Hooks, ...Utils, Comps, Hooks, Utils };
