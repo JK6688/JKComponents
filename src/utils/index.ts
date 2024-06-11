@@ -1,16 +1,12 @@
 import { createVNode, nextTick } from 'vue';
 import * as is from './is';
-import * as propTypes from './vuePropTypes';
-import * as timeZone from './timeZone';
-import * as withInstall from './withInstall';
 
 export * from './is';
 export * from './vuePropTypes';
 export * from './timeZone';
 export * from './withInstall';
 
-export const Utils = { is, propTypes, timeZone, withInstall };
-
+/** 代替eval方法 */
 export function evalPro(str: string) {
   try {
     const func = new Function(`'use strict'; return (${str});`);
@@ -20,12 +16,17 @@ export function evalPro(str: string) {
   }
 }
 
+/** 数字输入过滤
+ * @param eventVal 输入的值
+ * @param type 输入类型，int整数，float，default: 'int'
+ * @param maxDecimal 最大小数位，default: 6
+ */
 export function filterInputNum(
-  e: string | number,
+  eventVal: string | number,
   type: 'int' | 'float' = 'float',
   maxDecimal = 6
 ) {
-  let val = String(e);
+  let val = String(eventVal);
   val = val.replace(/(^\s*)|(\s*$)/g, '');
   if (val !== '') {
     const cases =
@@ -55,8 +56,17 @@ export function filterInputNum(
   return val;
 }
 
-/** 生成输入数字过滤函数 */
-export function generateHandleInputFn<T extends object, K extends keyof T>(
+/** 生成输入数字过滤函数
+ * @param obj 对象
+ * @param key 对象里面的字段名
+ * @param fn 输入过滤之后执行的函数
+ * @param type 输入类型，int整数，float，default: 'int'
+ * @param maxDecimal 最大小数位，default: 6
+ */
+export function generateFilterInputNumFn<
+  T extends Record<string, any>,
+  K extends keyof T
+>(
   obj: T,
   key: K,
   fn?: () => void,
@@ -77,11 +87,13 @@ export function renderHtmlStr(html: string) {
   return createVNode('div', { innerHTML: html });
 }
 
+/** 获取当前网站协议+域名 */
 export function getWebsiteUrl() {
   if (!window) return '';
   return `${window.location.protocol}//${window.location.hostname}`;
 }
 
+/** 获取路由参数 */
 export function getRouterParams() {
   const params = new URLSearchParams(window.location.search);
   if (!params.size) return;
@@ -90,4 +102,52 @@ export function getRouterParams() {
     result[key] = value;
   }
   return result;
+}
+
+/** 去除字符串里的所有空字符 */
+export function removeWhitespace(str: any) {
+  if (!is.isString(str)) return '';
+  return str.replace(/\s+/g, '');
+}
+
+/** 深度合并 */
+export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
+  let key: string;
+  for (key in target) {
+    src[key] = is.isObject(src[key])
+      ? deepMerge(src[key], target[key])
+      : (src[key] = target[key]);
+  }
+  return src;
+}
+
+/** 字符串脱敏
+ * @param str 值
+ * @param number 可见的字符数，default: 6
+ * @param options = {
+ *  showPrefix 显示前缀字符，default: true
+ *  showSuffix 显示后缀字符，default: true
+ *  middleStr 中间的字符串，default: '****'
+ * }
+ */
+export function desensitization(
+  str?: string | number,
+  number = 6,
+  options: {
+    showPrefix?: boolean;
+    showSuffix?: boolean;
+    middleStr?: string;
+  } = {
+    showPrefix: true,
+    showSuffix: true,
+    middleStr: '****'
+  }
+) {
+  if (!is.isString(str) || !is.isNumber(str)) return str;
+  const val = String(str);
+  const len = val?.length ?? 0;
+  if (!val || !len || number <= 0) return val;
+  const prefix = options.showPrefix ? val.substring(0, number) : '';
+  const suffix = options.showSuffix ? val.substring(len - number) : '';
+  return `${prefix}${options.middleStr}${suffix}`;
 }

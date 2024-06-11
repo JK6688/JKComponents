@@ -1,6 +1,6 @@
 import type { App, Plugin } from 'vue';
 
-/** 得到install方法 */
+/** 组件得到install方法 */
 export function withInstall<T>(component: T, alias?: string) {
   const comp = component as any;
   comp.install = (app: App) => {
