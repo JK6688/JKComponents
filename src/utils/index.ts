@@ -135,23 +135,23 @@ export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
 export function desensitization(
   str?: string | number,
   number = 6,
-  options: {
+  {
+    showPrefix = true,
+    showSuffix = true,
+    middleStr = '****'
+  }: {
     showPrefix?: boolean;
     showSuffix?: boolean;
     middleStr?: string;
-  } = {
-    showPrefix: true,
-    showSuffix: true,
-    middleStr: '****'
-  }
+  } = {}
 ) {
   if (!is.isString(str) && !is.isNumber(str)) return str;
   const val = String(str);
   const len = val?.length ?? 0;
   if (!val || !len || number <= 0) return val;
-  const prefix = options.showPrefix ? val.substring(0, number) : '';
-  const suffix = options.showSuffix ? val.substring(len - number) : '';
-  return `${prefix}${options.middleStr}${suffix}`;
+  const prefix = showPrefix ? val.substring(0, number) : '';
+  const suffix = showSuffix ? val.substring(len - number) : '';
+  return `${prefix}${middleStr}${suffix}`;
 }
 
 /** 数字转为样式单位

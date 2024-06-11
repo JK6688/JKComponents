@@ -51,8 +51,9 @@ export default () => {
         name: 'JKVUEComps',
         entry: {
           index: resolve(__dirname, 'src/index.tsx'),
-          ...getEntries('src/utils'),
-          ...getEntries('src/components')
+          ...getEntries('src/components'),
+          ...getEntries('src/hooks'),
+          ...getEntries('src/utils')
         },
         fileName: (module) => fileName(module, 'name'),
         formats: ['es']
