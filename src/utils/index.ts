@@ -1,4 +1,4 @@
-import { createVNode, nextTick } from 'vue';
+import { createVNode } from 'vue';
 import * as is from './is';
 import * as JKMath from './math';
 
@@ -76,10 +76,8 @@ export function generateFilterInputNumFn<
   maxDecimal = 6
 ) {
   return (e: ChangeEvent) => {
-    nextTick().then(() => {
-      obj[key] = filterInputNum(e?.target?.value, type, maxDecimal) as T[K];
-      fn?.();
-    });
+    obj[key] = filterInputNum(e?.target?.value, type, maxDecimal) as T[K];
+    fn?.();
   };
 }
 

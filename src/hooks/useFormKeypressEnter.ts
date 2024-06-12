@@ -1,12 +1,12 @@
 import { isFunction } from '@/utils/is';
-import type { Ref, ComputedRef } from 'vue';
+import { unref, type WatchSource } from 'vue';
 
 export function useFormKeypressEnter<
   T extends (...args: any[]) => any,
-  L extends Ref<boolean> | ComputedRef<boolean> | (() => boolean)
+  L extends WatchSource<boolean>
 >(fn: T, loading: L) {
   return function (...args: any[]) {
-    const isLoad = isFunction(loading) ? loading?.() : loading.value;
+    const isLoad = isFunction(loading) ? loading() : unref(loading);
     if (!isLoad) {
       return fn?.(...args);
     }
