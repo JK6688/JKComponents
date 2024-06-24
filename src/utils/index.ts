@@ -93,8 +93,6 @@ export function getWebsiteUrl() {
   return `${window.location.protocol}//${window.location.hostname}`;
 }
 
-getWebsiteUrl()
-
 /** 获取路由参数 */
 export function getRouterParams() {
   const params = new URLSearchParams(window.location.search);
