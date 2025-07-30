@@ -48,7 +48,7 @@ export function isString(val: unknown): val is string {
 }
 
 /** 是否函数 */
-export function isFunction(val: unknown): val is Function {
+export function isFunction(val: unknown): val is (...args: any[]) => any {
   return typeof val === 'function';
 }
 
@@ -115,10 +115,14 @@ export function isMap(val: unknown): val is Map<any, any> {
 }
 
 /** 是否服务端渲染，没有window对象 */
-export const isServer = typeof window === 'undefined';
+export function isServer() {
+  return typeof window === 'undefined';
+}
 
 /** 是否客户端，window对象不为undefined */
-export const isClient = !isServer;
+export function isClient() {
+  return !isServer();
+}
 
 /** 是否url */
 export function isUrl(path: string): boolean {
@@ -128,13 +132,16 @@ export function isUrl(path: string): boolean {
 }
 
 /** 是否Ip */
-export const isIp = (ip: string) => /\b(?:\d{1,3}.){3}\d{1,3}\b/.test(ip);
+export function isIp(ip: string) {
+  return /\b(?:\d{1,3}.){3}\d{1,3}\b/.test(ip);
+}
 
 /** 是否邮箱 */
-export const isEmail = (email: string) =>
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
-    email
-  );
+export function isEmail(email: string) {
+  const reg =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return reg.test(email);
+}
 
 /** 是否号码 */
 export function isValidPhoneNumber(phoneNumber: string) {
@@ -182,4 +189,6 @@ export function isEdgeBrowser() {
 }
 
 /** 是否html字符串 */
-export const isHtmlStr = (str: string) => isString(str) && /<[^>]+>/g.test(str);
+export function isHtmlStr(str: string) {
+  return isString(str) && /<[^>]+>/g.test(str);
+}

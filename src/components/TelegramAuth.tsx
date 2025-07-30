@@ -1,22 +1,11 @@
-import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
-import { propTypes } from '@/utils/vuePropTypes';
+import { defineComponent, onMounted, computed } from 'vue';
+import type { SlotsType, ExtractPropTypes } from 'vue';
 import {
   getWebsiteUrl,
   isInMobileBrowser,
-  isEdgeBrowser,
+  propTypes,
   withInstall
-} from '@/utils';
-
-/** tg用户信息 */
-export type TgUserData = {
-  auth_date: number;
-  first_name: string;
-  hash: string;
-  id: number;
-  last_name: string;
-  photo_url: string;
-  username: string;
-};
+} from '~/utils';
 
 /** 跳转Telegram身份检查 */
 export function toTelegramAuth(botId: number, toPath: string) {
@@ -24,11 +13,7 @@ export function toTelegramAuth(botId: number, toPath: string) {
   const httpUrl = encodeURIComponent(getWebsiteUrl());
   const routerUrl = encodeURIComponent(toPath);
   const url = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${httpUrl}&embed=1&request_access=write&return_to=${httpUrl}${routerUrl}`;
-  if (isEdgeBrowser()) {
-    window.open(url, '_self');
-  } else {
-    window.location.href = url;
-  }
+  window.location.href = url;
 }
 
 /** 获取路由中的Telegram身份检查回调参数 */
@@ -50,62 +35,111 @@ export function getTelegramAuthUrlParams(): TgUserData | null {
   }
 }
 
+/** tg用户信息 */
+export interface TgUserData {
+  auth_date: number;
+  first_name: string;
+  hash: string;
+  id: number;
+  last_name: string;
+  photo_url: string;
+  username: string;
+}
+
+const _comp_props = {
+  botId: propTypes.number,
+  toPath: propTypes.string,
+  defaultLoad: propTypes.bool,
+  getPopupContainer: propTypes.funcType<() => HTMLElement | Element>(),
+  onCallback: propTypes.funcType<(user: TgUserData) => void>(),
+  onRejectCallback: propTypes.funcType<() => void>()
+};
+
+export type TelegramAuthProps = ExtractPropTypes<typeof _comp_props>;
+
 const Telegram = defineComponent({
   name: 'TelegramAuth',
   toTelegramAuth,
   getTelegramAuthUrlParams,
-  props: {
-    botId: propTypes.number,
-    toPath: propTypes.string
-  },
-  emits: {
-    callback: (_user: TgUserData) => true || _user,
-    rejectCallback: () => true
-  },
+  props: _comp_props,
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit, slots, expose }) {
-    const telegramAuthDomRef = ref<HTMLElement | null>(null);
+  setup(props, { slots, expose }) {
+    const getConfigRef = computed(() => ({
+      id: props.botId,
+      path: props.toPath
+    }));
 
-    const getClientFn = () => (window as any)?.Telegram?.Login?.auth;
+    function getClientFn() {
+      return (window as any)?.Telegram?.Login?.auth;
+    }
 
-    function startCheck() {
-      const { botId, toPath } = props;
-      if (!botId) return;
-      const clientFn = getClientFn();
-      if (isInMobileBrowser() || !clientFn) {
-        toTelegramAuth(botId, toPath);
+    function getSetupEl() {
+      const _el = props.getPopupContainer?.();
+      return _el || document.body;
+    }
+
+    function setupScript() {
+      return new Promise<boolean>((resolve) => {
+        if (!document) {
+          resolve(false);
+          return;
+        }
+        if (isInMobileBrowser() || getClientFn()) {
+          resolve(true);
+          return;
+        }
+        const script = document.createElement('script');
+        script.async = true;
+        script.defer = true;
+        script.src = 'https://telegram.org/js/telegram-widget.js';
+        getSetupEl()?.appendChild?.(script);
+        script.onload = () => {
+          resolve(!!getClientFn());
+        };
+        script.onerror = () => {
+          script.remove();
+          resolve(false);
+        };
+      });
+    }
+
+    async function startCheck() {
+      const { id, path } = getConfigRef.value;
+      if (!isInMobileBrowser()) {
+        const bool = await setupScript();
+        if (!bool) {
+          toTelegramAuth(id || 0, path || '');
+          return;
+        }
+      }
+
+      if (isInMobileBrowser() || !getClientFn()) {
+        toTelegramAuth(id || 0, path || '');
         return;
       }
-      clientFn?.(
-        { bot_id: botId, request_access: true },
+      getClientFn()?.(
+        { bot_id: id, request_access: true },
         (data: TgUserData) => {
           if (data) {
-            emit('callback', data);
+            props.onCallback?.(data);
           } else {
-            emit('rejectCallback');
+            props.onRejectCallback?.();
           }
         }
       );
     }
 
-    function setupScript() {
-      if (!window?.document || getClientFn() || isInMobileBrowser()) return;
-      const script = document.createElement('script');
-      script.async = true;
-      script.defer = true;
-      script.src = 'https://telegram.org/js/telegram-widget.js';
-      telegramAuthDomRef.value?.appendChild(script);
-    }
-
-    onMounted(setupScript);
+    onMounted(() => {
+      if (props.defaultLoad) {
+        setupScript();
+      }
+    });
 
     expose({ startCheck });
 
-    return () => (
-      <div ref={telegramAuthDomRef}>{slots.default?.({ startCheck })}</div>
-    );
+    return () => <div>{slots.default?.({ startCheck })}</div>;
   }
 });
 

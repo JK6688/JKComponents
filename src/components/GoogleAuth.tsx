@@ -1,83 +1,114 @@
-import { defineComponent, onMounted, ref, type SlotsType } from 'vue';
-import { propTypes } from '@/utils/vuePropTypes';
-import { isInMobileBrowser, isEdgeBrowser, withInstall } from '@/utils';
+import { defineComponent, computed, onMounted } from 'vue';
+import type { SlotsType, ExtractPropTypes } from 'vue';
+import { isInMobileBrowser, propTypes, withInstall } from '~/utils';
 
 /** 跳转谷歌身份检查 */
 export function toGoogleAuth(clientId: string, redirectUri: string) {
   if (!clientId || !redirectUri) return;
-  const routerUrl = encodeURIComponent(redirectUri);
+  const uri = encodeURIComponent(redirectUri);
   const scope = encodeURIComponent('email profile');
   const _clientId = encodeURIComponent(clientId);
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=${routerUrl}&scope=${scope}&client_id=${_clientId}`;
-  if (isEdgeBrowser()) {
-    window.open(url, '_self');
-  } else {
-    window.location.href = url;
-  }
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&redirect_uri=${uri}&scope=${scope}&client_id=${_clientId}`;
+  window.location.href = url;
 }
+
+const _comp_props = {
+  clientId: propTypes.string,
+  redirectUri: propTypes.string,
+  defaultLoad: propTypes.bool,
+  getPopupContainer: propTypes.funcType<() => HTMLElement | Element>(),
+  onCallback: propTypes.funcType<(data: { code: string }) => void>(),
+  onRejectCallback: propTypes.funcType<(error: any) => void>()
+};
+
+export type GoogleAuthProps = ExtractPropTypes<typeof _comp_props>;
 
 const Google = defineComponent({
   name: 'GoogleAuth',
   toGoogleAuth,
-  props: {
-    clientId: propTypes.string,
-    redirectUri: propTypes.string
-  },
-  emits: {
-    callback: (_data: { code: string }) => true || _data,
-    rejectCallback: (_data: any) => true || _data
-  },
+  props: _comp_props,
   slots: Object as SlotsType<{
     default: { startCheck: () => void };
   }>,
-  setup(props, { emit, slots, expose }) {
-    const googleAuthDomRef = ref<HTMLElement | null>(null);
+  setup(props, { slots, expose }) {
+    const getConfigRef = computed(() => ({
+      id: props.clientId,
+      uri: props.redirectUri
+    }));
 
-    const isHidden = ref(true);
+    function getClientFn() {
+      return (window as any)?.google?.accounts?.oauth2?.initCodeClient;
+    }
 
-    const getClientFn = () =>
-      (window as any)?.google?.accounts?.oauth2?.initCodeClient;
+    function getSetupEl() {
+      const _el = props.getPopupContainer?.();
+      return _el || document.body;
+    }
 
-    function startCheck() {
+    function setupScript() {
+      return new Promise<boolean>((resolve) => {
+        if (!document) {
+          resolve(false);
+          return;
+        }
+        if (isInMobileBrowser() || getClientFn()) {
+          resolve(true);
+          return;
+        }
+        const script = document.createElement('script');
+        script.async = true;
+        script.defer = true;
+        script.src = 'https://accounts.google.com/gsi/client';
+        getSetupEl()?.appendChild?.(script);
+        script.onload = () => {
+          resolve(!!getClientFn());
+        };
+        script.onerror = () => {
+          script.remove();
+          resolve(false);
+        };
+      });
+    }
+
+    async function startCheck() {
+      const { id, uri } = getConfigRef.value;
+      if (!isInMobileBrowser()) {
+        const bool = await setupScript();
+        if (!bool) {
+          toGoogleAuth(id || '', uri || '');
+          return;
+        }
+      }
+
+      if (isInMobileBrowser() || !getClientFn()) {
+        toGoogleAuth(id || '', uri || '');
+        return;
+      }
+
       getClientFn()?.({
-        client_id: props.clientId,
+        client_id: id,
         scope: 'email profile',
-        redirect_uri: props.redirectUri,
+        redirect_uri: uri,
         ux_mode: isInMobileBrowser() ? 'redirect' : 'popup',
         callback(data: any) {
-          if (data.error) {
-            emit('rejectCallback', data);
+          if (data?.error) {
+            props.onRejectCallback?.(data.error);
           } else {
-            emit('callback', data);
+            props.onCallback?.(data);
           }
         }
       })?.requestCode?.();
     }
 
-    function setupScript() {
-      if (!window?.document || getClientFn() || !googleAuthDomRef.value) {
-        if (getClientFn()) isHidden.value = false;
-        return;
+    onMounted(() => {
+      if (props.defaultLoad) {
+        setupScript();
       }
-      const script = document.createElement('script');
-      script.async = true;
-      script.defer = true;
-      script.src = 'https://accounts.google.com/gsi/client';
-      googleAuthDomRef.value.appendChild(script);
-      script.onload = () => {
-        if (getClientFn()) isHidden.value = false;
-      };
-    }
-
-    onMounted(setupScript);
+    });
 
     expose({ startCheck });
 
-    return () => (
-      <div ref={googleAuthDomRef}>
-        {!isHidden.value && slots.default?.({ startCheck })}
-      </div>
-    );
+    return () => <div>{slots.default?.({ startCheck })}</div>;
   }
 });
 

@@ -43,14 +43,14 @@ export default () => {
     ],
     resolve: {
       alias: {
-        '@': '/src'
+        '~': '/src'
       }
     },
     build: {
       lib: {
         name: 'JKVUEComps',
         entry: {
-          index: resolve(__dirname, 'src/index.tsx'),
+          index: resolve(__dirname, 'src/index'),
           ...getEntries('src/components'),
           ...getEntries('src/hooks'),
           ...getEntries('src/utils')

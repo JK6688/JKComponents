@@ -3,7 +3,7 @@ import * as VueTypes from 'vue-types';
 
 const { createTypes, toValidableType } = VueTypes;
 
-const defVal = undefined;
+const defVal = void 0;
 
 class VuePropTypes extends createTypes({
   func: defVal,

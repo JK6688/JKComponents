@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue';
-import { isDef } from '@/utils/is';
+import { isDef } from '~/utils/is';
 
 export function useCopyToClipboard(initial?: string) {
   const clipboardRef = ref(initial || '');
