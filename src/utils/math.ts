@@ -216,3 +216,15 @@ export function unFormatRate(val: BigNumValType) {
   const result = helper(val).div(100);
   return isGreaterThan(result, 0) ? toDecimalPlaces(result, 4) : 0;
 }
+
+export const gt = isGreaterThan;
+
+export const gte = isGreaterThanOrEqualTo;
+
+export const lt = isLessThan;
+
+export const lte = isLessThanOrEqualTo;
+
+export const eq = isEqualTo;
+
+export const isNan = isNanValue;

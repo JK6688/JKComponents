@@ -1,6 +1,6 @@
 import { defineComponent, computed, onMounted } from 'vue';
-import type { SlotsType, ExtractPropTypes } from 'vue';
-import { isInMobileBrowser, propTypes, withInstall } from '~/utils';
+import type { SlotsType, PropType, ExtractPropTypes } from 'vue';
+import { isInMobileBrowser, withInstall } from '~/utils';
 
 /** 跳转谷歌身份检查 */
 export function toGoogleAuth(clientId: string, redirectUri: string) {
@@ -12,18 +12,20 @@ export function toGoogleAuth(clientId: string, redirectUri: string) {
   window.location.href = url;
 }
 
+type GetPopupContainerFn = () => HTMLElement | Element;
+
 const _comp_props = {
-  clientId: propTypes.string,
-  redirectUri: propTypes.string,
-  defaultLoad: propTypes.bool,
-  getPopupContainer: propTypes.funcType<() => HTMLElement | Element>(),
-  onCallback: propTypes.funcType<(data: { code: string }) => void>(),
-  onRejectCallback: propTypes.funcType<(error: any) => void>()
+  clientId: { type: String },
+  redirectUri: { type: String },
+  defaultLoad: { type: Boolean },
+  getPopupContainer: { type: Function as PropType<GetPopupContainerFn> },
+  onCallback: { type: Function as PropType<(data: { code: string }) => void> },
+  onRejectCallback: { type: Function as PropType<(error: any) => void> }
 };
 
 export type GoogleAuthProps = ExtractPropTypes<typeof _comp_props>;
 
-const Google = defineComponent({
+const Google = defineComponent<GoogleAuthProps>({
   name: 'GoogleAuth',
   toGoogleAuth,
   props: _comp_props,

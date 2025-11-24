@@ -1,11 +1,6 @@
 import { defineComponent, onMounted, computed } from 'vue';
-import type { SlotsType, ExtractPropTypes } from 'vue';
-import {
-  getWebsiteUrl,
-  isInMobileBrowser,
-  propTypes,
-  withInstall
-} from '~/utils';
+import type { SlotsType, PropType, ExtractPropTypes } from 'vue';
+import { getWebsiteUrl, isInMobileBrowser, withInstall } from '~/utils';
 
 /** 跳转Telegram身份检查 */
 export function toTelegramAuth(botId: number, toPath: string) {
@@ -46,18 +41,20 @@ export interface TgUserData {
   username: string;
 }
 
+type GetPopupContainerFn = () => HTMLElement | Element;
+
 const _comp_props = {
-  botId: propTypes.number,
-  toPath: propTypes.string,
-  defaultLoad: propTypes.bool,
-  getPopupContainer: propTypes.funcType<() => HTMLElement | Element>(),
-  onCallback: propTypes.funcType<(user: TgUserData) => void>(),
-  onRejectCallback: propTypes.funcType<() => void>()
+  botId: { type: Number },
+  toPath: { type: String },
+  defaultLoad: { type: Boolean },
+  getPopupContainer: { type: Function as PropType<GetPopupContainerFn> },
+  onCallback: { type: Function as PropType<(user: TgUserData) => void> },
+  onRejectCallback: { type: Function as PropType<() => void> }
 };
 
 export type TelegramAuthProps = ExtractPropTypes<typeof _comp_props>;
 
-const Telegram = defineComponent({
+const Telegram = defineComponent<TelegramAuthProps>({
   name: 'TelegramAuth',
   toTelegramAuth,
   getTelegramAuthUrlParams,

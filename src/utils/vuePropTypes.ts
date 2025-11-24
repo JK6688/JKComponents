@@ -1,39 +1,40 @@
 import type { CSSProperties, VNode, VNodeChild } from 'vue';
+import type { VueTypeValidableDef } from 'vue-types';
 import * as VueTypes from 'vue-types';
-
-const { createTypes, toValidableType } = VueTypes;
 
 const defVal = void 0;
 
-class VuePropTypes extends createTypes({
+class VuePropTypes extends (VueTypes.createTypes({
   func: defVal,
   bool: defVal,
   string: defVal,
   number: defVal,
   object: defVal,
   integer: defVal
-}) {
+}) as ReturnType<typeof VueTypes.createTypes>) {
   static vueTypes = VueTypes;
 
-  static anyType = VueTypes.any;
+  static anyType: typeof VueTypes.any = VueTypes.any;
 
-  static stringType = VueTypes.string;
+  static stringType: typeof VueTypes.string = VueTypes.string;
 
-  static boolType = VueTypes.bool;
+  static boolType: typeof VueTypes.bool = VueTypes.bool;
 
-  static numberType = VueTypes.number;
+  static numberType: typeof VueTypes.number = VueTypes.number;
 
-  static funcType = VueTypes.func;
+  static funcType: typeof VueTypes.func = VueTypes.func;
 
-  static get style() {
-    return toValidableType<CSSProperties>('style', {
+  static get style(): VueTypeValidableDef<CSSProperties> {
+    return VueTypes.toValidableType<CSSProperties>('style', {
       type: [Object],
       default: defVal
     });
   }
 
-  static get vueNode() {
-    return toValidableType<VNode | VNodeChild>('vueNode', { default: defVal });
+  static get vueNode(): VueTypeValidableDef<VNode | VNodeChild> {
+    return VueTypes.toValidableType<VNode | VNodeChild>('vueNode', {
+      default: defVal
+    });
   }
 }
 
