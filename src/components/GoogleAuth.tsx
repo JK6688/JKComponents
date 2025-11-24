@@ -15,15 +15,15 @@ export function toGoogleAuth(clientId: string, redirectUri: string) {
 type GetPopupContainerFn = () => HTMLElement | Element;
 
 const _comp_props = {
-  clientId: { type: String },
-  redirectUri: { type: String },
-  defaultLoad: { type: Boolean },
+  clientId: String,
+  redirectUri: String,
+  defaultLoad: Boolean,
   getPopupContainer: { type: Function as PropType<GetPopupContainerFn> },
   onCallback: { type: Function as PropType<(data: { code: string }) => void> },
   onRejectCallback: { type: Function as PropType<(error: any) => void> }
 };
 
-export type GoogleAuthProps = ExtractPropTypes<typeof _comp_props>;
+export type GoogleAuthProps = Partial<ExtractPropTypes<typeof _comp_props>>;
 
 const Google = defineComponent<GoogleAuthProps>({
   name: 'GoogleAuth',

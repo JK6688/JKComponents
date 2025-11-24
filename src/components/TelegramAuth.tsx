@@ -44,15 +44,15 @@ export interface TgUserData {
 type GetPopupContainerFn = () => HTMLElement | Element;
 
 const _comp_props = {
-  botId: { type: Number },
-  toPath: { type: String },
-  defaultLoad: { type: Boolean },
+  botId: Number,
+  toPath: String,
+  defaultLoad: Boolean,
   getPopupContainer: { type: Function as PropType<GetPopupContainerFn> },
   onCallback: { type: Function as PropType<(user: TgUserData) => void> },
   onRejectCallback: { type: Function as PropType<() => void> }
 };
 
-export type TelegramAuthProps = ExtractPropTypes<typeof _comp_props>;
+export type TelegramAuthProps = Partial<ExtractPropTypes<typeof _comp_props>>;
 
 const Telegram = defineComponent<TelegramAuthProps>({
   name: 'TelegramAuth',
