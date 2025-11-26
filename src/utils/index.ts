@@ -1,4 +1,4 @@
-import { createVNode } from 'vue';
+import { createVNode, nextTick } from 'vue';
 import * as is from './is';
 import * as JKMath from './math';
 
@@ -28,32 +28,33 @@ export function filterInputNum(
   type: 'int' | 'float' = 'float',
   maxDecimal = 6
 ) {
-  let val = String(eventVal);
+  const isInt = type === 'int';
+
+  let val = String(eventVal).trim();
   val = val.replace(/(^\s*)|(\s*$)/g, '');
-  if (val !== '') {
-    const cases =
-      val.indexOf('0') === 0 && val.length > 1 && val.indexOf('.') !== 1;
-    const reg = type === 'int' ? /[^\d]/g : /[^\d.]/g;
-    val = val.replace(reg, '');
-    if (cases) {
-      return '0';
+  val = val.replace(isInt ? /[^\d]/g : /[^\d.]/g, '');
+  val = val.replace(/^0+(?=\d)/, '');
+
+  if (!val) {
+    return '';
+  }
+  if (isInt) {
+    return val.replace(/^(0\.|\.)/, '');
+  }
+  if (val.startsWith('.')) {
+    return '0.';
+  }
+  if (val.includes('.')) {
+    const parts = val.split('.');
+
+    const integerPart = parts[0];
+    let decimalPart = parts[1];
+
+    if (decimalPart.length > maxDecimal) {
+      decimalPart = decimalPart.slice(0, maxDecimal);
     }
-    if (type === 'int') {
-      val =
-        val.indexOf('0') === 0 && val.length > 1
-          ? val.substring(0, val.length - 1)
-          : val;
-    } else {
-      const req1 = evalPro(`/\\.{${maxDecimal},}/g`);
-      const req2 = evalPro(`/^(\\d?)+(\\.\\d{0,${maxDecimal}})?$/`);
-      if (val.indexOf('.') === 0) {
-        val = '';
-        val = val.replace(/[^$#$]/g, '0.');
-        val = val.replace(req1, '.');
-      } else if (!req2.test(val)) {
-        val = val.substring(0, val.length - 1);
-      }
-    }
+
+    val = `${integerPart}.${decimalPart}`;
   }
   return val;
 }
@@ -76,7 +77,22 @@ export function generateFilterInputNumFn<
   maxDecimal = 6
 ) {
   return (e: ChangeEvent) => {
-    obj[key] = filterInputNum(e?.target?.value, type, maxDecimal) as T[K];
+    const oldVal = e?.target?.value ?? obj[key];
+
+    const nextVal = filterInputNum(oldVal, type, maxDecimal) as T[K];
+
+    if (nextVal !== oldVal) {
+      if (
+        e?.target &&
+        Object.prototype.hasOwnProperty.call(e.target, 'value')
+      ) {
+        e.target.value = nextVal;
+      }
+      nextTick(() => {
+        obj[key] = nextVal;
+        e?.target?.focus?.();
+      });
+    }
     fn?.();
   };
 }

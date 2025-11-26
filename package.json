@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "jk-vue-comps",
   "type": "module",
   "main": "dist/index.js",
@@ -36,8 +36,8 @@
     "@types/node": "22.18.0",
     "@vitejs/plugin-vue": "6.0.2",
     "@vitejs/plugin-vue-jsx": "5.1.2",
-    "@typescript-eslint/eslint-plugin": "^8.47.0",
-    "@typescript-eslint/parser": "^8.47.0",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
