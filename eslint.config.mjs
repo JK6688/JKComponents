@@ -36,6 +36,8 @@ export default [
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/ban-types': 'off'
     }
