@@ -9,9 +9,15 @@ export function useCopyToClipboard(initial?: string) {
   watch(
     clipboardRef,
     (str?: string) => {
-      if (isDef(str)) {
-        copiedRef.value = true;
-        isSuccessRef.value = copyTextToClipboard(str);
+      if (isDef(str) && str !== '') {
+        try {
+          isSuccessRef.value = copyTextToClipboard(str);
+          copiedRef.value = true;
+        } catch (error) {
+          isSuccessRef.value = false;
+          copiedRef.value = false;
+          console.error('Copy failed:', error);
+        }
       }
     },
     { immediate: !!initial, flush: 'sync' }
@@ -32,19 +38,19 @@ export function copyTextToClipboard(
   const previouslyFocusedElement = document.activeElement;
 
   element.value = input;
-
   element.setAttribute('readonly', '');
 
-  (element.style as any).contain = 'strict';
-  element.style.position = 'absolute';
-  element.style.left = '-9999px';
-  element.style.fontSize = '12pt';
+  Object.assign(element.style, {
+    contain: 'strict',
+    position: 'absolute',
+    left: '-9999px',
+    fontSize: '12pt'
+  });
 
   const selection = document.getSelection();
-  let originalRange;
-  if (selection && selection.rangeCount > 0) {
-    originalRange = selection.getRangeAt(0);
-  }
+
+  const originalRange =
+    selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
   target.append(element);
   element.select();
@@ -52,22 +58,23 @@ export function copyTextToClipboard(
   element.selectionStart = 0;
   element.selectionEnd = input.length;
 
-  let isSuccess = false;
   try {
-    isSuccess = document.execCommand('copy');
-  } catch (e: any) {
-    throw new Error(e);
-  }
+    return document.execCommand('copy');
+  } catch (e: unknown) {
+    throw new Error('Unable to copy text to clipboard', { cause: e });
+  } finally {
+    element.remove();
 
-  element.remove();
+    if (originalRange && selection) {
+      selection.removeAllRanges();
+      selection.addRange(originalRange);
+    }
 
-  if (originalRange && selection) {
-    selection.removeAllRanges();
-    selection.addRange(originalRange);
+    if (
+      previouslyFocusedElement &&
+      (previouslyFocusedElement as HTMLElement).focus
+    ) {
+      (previouslyFocusedElement as HTMLElement).focus();
+    }
   }
-
-  if (previouslyFocusedElement) {
-    (previouslyFocusedElement as HTMLElement).focus();
-  }
-  return isSuccess;
 }
