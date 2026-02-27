@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "jk-vue-comps",
   "type": "module",
   "main": "dist/index.js",
@@ -27,9 +27,9 @@
     "check-types": "tsc --project tsconfig.json --noEmitOnError"
   },
   "dependencies": {
-    "vue": "3.5.28",
+    "vue": "3.5.29",
     "vue-types": "6.0.0",
-    "bignumber.js": "9.3.1"
+    "bignumber.js": "10.0.2"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.3.0",

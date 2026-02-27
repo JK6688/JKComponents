@@ -1,6 +1,6 @@
 import BJS from 'bignumber.js';
 
-export type BigNumVal = Parameters<typeof BJS>[0];
+export type BigNumVal = BJS.Value;
 
 export type BigNumValType = BigNumVal | undefined | null | boolean;
 

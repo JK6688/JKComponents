@@ -137,10 +137,19 @@ export function isIp(ip: string) {
 }
 
 /** 是否邮箱 */
-export function isEmail(email: string) {
+export function isEmail(v: any) {
+  if (!v || typeof v !== 'string' || v.length > 254) {
+    return false;
+  }
+
+  if (/[\r\n]/.test(v)) {
+    return false;
+  }
+
   const reg =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return reg.test(email);
+    /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]{2,})+$/;
+
+  return reg.test(v);
 }
 
 /** 是否号码 */
