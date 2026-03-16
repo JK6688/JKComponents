@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "semi": true,
+  "vueIndentScriptAndStyle": true,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "proseWrap": "never",
+  "htmlWhitespaceSensitivity": "strict",
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "sortPackageJson": false,
+  "ignorePatterns": ["dist/**", "node_modules/**", "**/*.svg", "**/*.min.js"]
+}

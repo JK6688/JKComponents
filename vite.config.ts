@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import typescript from '@rollup/plugin-typescript';
+import dts from 'vite-plugin-dts';
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
 
@@ -36,9 +36,12 @@ export default () => {
     plugins: [
       vue(),
       vueJsx(),
-      typescript({
-        declaration: true,
-        emitDeclarationOnly: true
+      dts({
+        outDir: 'dist',
+        staticImport: true,
+        insertTypesEntry: true,
+        cleanVueFileName: true,
+        copyDtsFiles: false
       })
     ],
     resolve: {

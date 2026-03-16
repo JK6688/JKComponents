@@ -49,8 +49,7 @@ export function copyTextToClipboard(
 
   const selection = document.getSelection();
 
-  const originalRange =
-    selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+  const originalRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
   target.append(element);
   element.select();
@@ -70,10 +69,7 @@ export function copyTextToClipboard(
       selection.addRange(originalRange);
     }
 
-    if (
-      previouslyFocusedElement &&
-      (previouslyFocusedElement as HTMLElement).focus
-    ) {
+    if (previouslyFocusedElement && (previouslyFocusedElement as HTMLElement).focus) {
       (previouslyFocusedElement as HTMLElement).focus();
     }
   }

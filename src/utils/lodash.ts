@@ -71,9 +71,7 @@ export function cloneDeep<T>(target: T, map = new WeakMap<object, any>()): T {
   if (actualTarget instanceof Map) {
     const result = new Map();
     map.set(actualTarget, result);
-    actualTarget.forEach((v, k) =>
-      result.set(cloneDeep(k, map), cloneDeep(v, map))
-    );
+    actualTarget.forEach((v, k) => result.set(cloneDeep(k, map), cloneDeep(v, map)));
     return result as any;
   }
   if (actualTarget instanceof Set) {
@@ -86,9 +84,7 @@ export function cloneDeep<T>(target: T, map = new WeakMap<object, any>()): T {
   let cloneTarget: any;
   if (Array.isArray(actualTarget)) {
     cloneTarget = [];
-  } else if (
-    Object.prototype.toString.call(actualTarget) === '[object Object]'
-  ) {
+  } else if (Object.prototype.toString.call(actualTarget) === '[object Object]') {
     cloneTarget = {};
   } else {
     return actualTarget;
@@ -96,9 +92,7 @@ export function cloneDeep<T>(target: T, map = new WeakMap<object, any>()): T {
 
   map.set(actualTarget as object, cloneTarget);
 
-  const keys = Array.isArray(actualTarget)
-    ? void 0
-    : Object.keys(actualTarget as object);
+  const keys = Array.isArray(actualTarget) ? void 0 : Object.keys(actualTarget as object);
 
   (keys || (actualTarget as any)).forEach((val: any, key: any) => {
     const actualKey = keys ? val : key;
@@ -167,10 +161,7 @@ export function omit<T extends object, K extends keyof T = keyof T>(
 ): Omit<T, K>;
 export function omit<T extends object>(obj: T): T;
 export function omit<T extends null | undefined>(obj: T, keys?: any): T;
-export function omit<T extends string | number | boolean | symbol>(
-  obj: T,
-  keys?: any
-): T;
+export function omit<T extends string | number | boolean | symbol>(obj: T, keys?: any): T;
 export function omit(obj: any, keys?: any): any {
   if (obj === null || obj === void 0 || typeof obj !== 'object') {
     return obj;
@@ -201,10 +192,7 @@ type GetPathValue<T, P extends string> = P extends `${infer Key}.${infer Rest}`
     ? T[P]
     : undefined;
 /** 代替lodash.get */
-export function get<T extends object, P extends string>(
-  obj: T,
-  path: P
-): GetPathValue<T, P>;
+export function get<T extends object, P extends string>(obj: T, path: P): GetPathValue<T, P>;
 export function get<T extends object, P extends string, D>(
   obj: T,
   path: P,
@@ -249,11 +237,7 @@ export function set<T>(obj: T, path: string | number, value: any): T {
   for (let i = 0; i < segments.length - 1; i++) {
     const key = segments[i];
     const nextKey = segments[i + 1];
-    if (
-      !(key in current) ||
-      current[key] === null ||
-      typeof current[key] !== 'object'
-    ) {
+    if (!(key in current) || current[key] === null || typeof current[key] !== 'object') {
       const isNextKeyNumber = /^\d+$/.test(nextKey);
       current[key] = isNextKeyNumber ? [] : {};
     }
@@ -277,28 +261,15 @@ export function isEqual(value: any, other: any): boolean {
     return true;
   }
 
-  if (
-    typeof value === 'number' &&
-    typeof other === 'number' &&
-    isNaN(value) &&
-    isNaN(other)
-  ) {
+  if (typeof value === 'number' && typeof other === 'number' && isNaN(value) && isNaN(other)) {
     return true;
   }
 
-  if (
-    typeof value !== 'object' ||
-    value === null ||
-    typeof other !== 'object' ||
-    other === null
-  ) {
+  if (typeof value !== 'object' || value === null || typeof other !== 'object' || other === null) {
     return false;
   }
 
-  if (
-    Object.prototype.toString.call(value) !==
-    Object.prototype.toString.call(other)
-  ) {
+  if (Object.prototype.toString.call(value) !== Object.prototype.toString.call(other)) {
     return false;
   }
   if (value instanceof Date) {
@@ -334,10 +305,7 @@ export function isEqual(value: any, other: any): boolean {
   }
 
   for (const key of keysA) {
-    if (
-      !Object.prototype.hasOwnProperty.call(other, key) ||
-      !isEqual(value[key], other[key])
-    ) {
+    if (!Object.prototype.hasOwnProperty.call(other, key) || !isEqual(value[key], other[key])) {
       return false;
     }
   }
@@ -366,8 +334,7 @@ export function uniqBy<T>(
   const seen = new Set();
 
   for (const item of array) {
-    const identifier =
-      typeof iteratee === 'function' ? iteratee(item) : item[iteratee];
+    const identifier = typeof iteratee === 'function' ? iteratee(item) : item[iteratee];
 
     if (!seen.has(identifier)) {
       seen.add(identifier);
@@ -392,10 +359,7 @@ function _isObject(item: any): item is Record<string, any> {
 }
 
 /** 代替lodash.merge */
-export function merge<T extends object, S extends object[]>(
-  target: T,
-  ...sources: S
-): T & any {
+export function merge<T extends object, S extends object[]>(target: T, ...sources: S): T & any {
   if (!sources.length) {
     return target;
   }
@@ -438,10 +402,7 @@ export function merge<T extends object, S extends object[]>(
 }
 
 /** 代替lodash.difference */
-export function difference<T>(
-  array: T[] | null | undefined,
-  ...values: T[][]
-): T[] {
+export function difference<T>(array: T[] | null | undefined, ...values: T[][]): T[] {
   if (!Array.isArray(array)) {
     return [];
   }

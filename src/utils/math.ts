@@ -13,11 +13,17 @@ export const UP = BJS.ROUND_UP;
 export const BigNumber = BJS;
 
 export function helper(val: BigNumValType): BigNumObj {
-  if (isBool(val)) return BJS(~~val);
+  if (isBool(val)) {
+    return BJS(~~val);
+  }
 
-  if (!val) return BJS(0);
+  if (!val) {
+    return BJS(0);
+  }
 
-  if (isBigNum(val)) return val.isNaN() ? BJS(0) : val;
+  if (isBigNum(val)) {
+    return val.isNaN() ? BJS(0) : val;
+  }
 
   const res = BJS(val);
   return res.isNaN() ? BJS(0) : res;
@@ -40,13 +46,17 @@ export function isNum(val: any): val is number {
 
 /** 是否为NaN值(传入任意值转bignumber是否为NaN) */
 export function isNanValue(val: any) {
-  if (val == null || val == void 0) return false;
+  if (val == null || val == void 0) {
+    return false;
+  }
   return BJS(val).isNaN();
 }
 
 /** 是否为整数(传入任意值转bignumber是否为整数) */
 export function isInt(val: any) {
-  if (val == null || val == void 0) return false;
+  if (val == null || val == void 0) {
+    return false;
+  }
   return BJS(val).isInteger();
 }
 
@@ -121,11 +131,7 @@ export function toString(val: BigNumValType) {
  * @example toDecimalPlaces(2.326, 2, true) => 2.33
  * @example toDecimalPlaces(-5.526, 2, true) => -5.53
  */
-export function toDecimalPlaces(
-  val: BigNumValType,
-  decimal?: number,
-  isUp = false
-) {
+export function toDecimalPlaces(val: BigNumValType, decimal?: number, isUp = false) {
   const result = helper(val);
   return decimal !== void 0
     ? toNum(result.decimalPlaces(decimal, isUp ? UP : DOWN))
@@ -143,7 +149,9 @@ export function toLocaleString(val: BigNumValType) {
  * @example add(3, 3, 4) => 10
  */
 export function add(...vals: BigNumValType[]) {
-  if (vals.length === 0) return 0;
+  if (vals.length === 0) {
+    return 0;
+  }
   const res = vals.reduce((acc, curr) => helper(acc).plus(helper(curr)), 0);
   return toNum(res);
 }
@@ -154,7 +162,9 @@ export function add(...vals: BigNumValType[]) {
  * @example subtract(5, 3, '2') => 0
  */
 export function subtract(...vals: BigNumValType[]) {
-  if (vals.length === 0) return 0;
+  if (vals.length === 0) {
+    return 0;
+  }
   const res = vals.reduce((acc, curr) => helper(acc).minus(helper(curr)));
   return toNum(res);
 }
@@ -165,7 +175,9 @@ export function subtract(...vals: BigNumValType[]) {
  * @example multiply(3, 5, '2') => 30
  */
 export function multiply(...vals: BigNumValType[]) {
-  if (vals.length === 0) return 0;
+  if (vals.length === 0) {
+    return 0;
+  }
   const res = vals.reduce((acc, curr) => helper(acc).times(helper(curr)), 1);
   return toNum(res);
 }
@@ -177,12 +189,16 @@ export function multiply(...vals: BigNumValType[]) {
  * @example divide('100', 0, 10) => 0
  */
 export function divide(...vals: BigNumValType[]) {
-  if (vals.length === 0) return 0;
+  if (vals.length === 0) {
+    return 0;
+  }
 
   const bigNums = vals.map((x) => toBigNum(x));
 
   // 除数有0存在时
-  if (bigNums.some((x) => x.isZero())) return 0;
+  if (bigNums.some((x) => x.isZero())) {
+    return 0;
+  }
 
   const res = bigNums.reduce((acc, curr) => acc.dividedBy(curr));
 

@@ -86,12 +86,7 @@ export function isEmpty<T = unknown>(val: T): val is T {
 
 /** 是否Promise */
 export function isPromise<T = any>(val: unknown): val is Promise<T> {
-  return (
-    is(val, 'Promise') &&
-    isObject(val) &&
-    isFunction(val.then) &&
-    isFunction(val.catch)
-  );
+  return is(val, 'Promise') && isObject(val) && isFunction(val.then) && isFunction(val.catch);
 }
 
 /** 是否PromiseLink */
@@ -127,7 +122,7 @@ export function isClient() {
 /** 是否url */
 export function isUrl(path: string): boolean {
   const reg =
-    /^(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?(\/#\/)?(?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
+    /^(((^https?:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?(\/#\/)?(?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
   return reg.test(path);
 }
 
@@ -146,8 +141,7 @@ export function isEmail(v: any) {
     return false;
   }
 
-  const reg =
-    /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]{2,})+$/;
+  const reg = /^[a-zA-Z0-9]+([._+-][a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]{2,})+$/;
 
   return reg.test(v);
 }
@@ -158,9 +152,13 @@ export function isValidPhoneNumber(phoneNumber: string) {
 
   const landlineRegex = /^(\d{3,4}-)?\d{7,8}$/;
 
-  if (mobileRegex.test(phoneNumber)) return true;
+  if (mobileRegex.test(phoneNumber)) {
+    return true;
+  }
 
-  if (landlineRegex.test(phoneNumber)) return true;
+  if (landlineRegex.test(phoneNumber)) {
+    return true;
+  }
 
   return false;
 }
@@ -169,9 +167,7 @@ export function isValidPhoneNumber(phoneNumber: string) {
 export function isInMobileBrowser() {
   return (
     typeof navigator !== 'undefined' &&
-    navigator.userAgent.match(
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i
-    )
+    navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i)
   );
 }
 

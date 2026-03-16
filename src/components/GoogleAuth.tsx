@@ -4,7 +4,9 @@ import { isInMobileBrowser, withInstall } from '~/utils';
 
 /** 跳转谷歌身份检查 */
 export function toGoogleAuth(clientId: string, redirectUri: string) {
-  if (!clientId || !redirectUri) return;
+  if (!clientId || !redirectUri) {
+    return;
+  }
   const uri = encodeURIComponent(redirectUri);
   const scope = encodeURIComponent('email profile');
   const _clientId = encodeURIComponent(clientId);

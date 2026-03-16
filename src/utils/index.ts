@@ -66,10 +66,7 @@ export function filterInputNum(
  * @param type 输入类型，int整数，float，default: 'int'
  * @param maxDecimal 最大小数位，default: 6
  */
-export function generateFilterInputNumFn<
-  T extends Recordable,
-  K extends keyof T
->(
+export function generateFilterInputNumFn<T extends Recordable, K extends keyof T>(
   obj: T,
   key: K,
   fn?: () => void,
@@ -82,10 +79,7 @@ export function generateFilterInputNumFn<
     const nextVal = filterInputNum(oldVal, type, maxDecimal) as T[K];
 
     if (nextVal !== oldVal) {
-      if (
-        e?.target &&
-        Object.prototype.hasOwnProperty.call(e.target, 'value')
-      ) {
+      if (e?.target && Object.prototype.hasOwnProperty.call(e.target, 'value')) {
         e.target.value = nextVal;
       }
       nextTick(() => {
@@ -99,20 +93,26 @@ export function generateFilterInputNumFn<
 
 /** 渲染Html字符串片段 */
 export function renderHtmlStr(html: string) {
-  if (!is.isString(html) || !is.isHtmlStr(html)) return html;
+  if (!is.isString(html) || !is.isHtmlStr(html)) {
+    return html;
+  }
   return createVNode('div', { innerHTML: html });
 }
 
 /** 获取当前网站协议+域名 */
 export function getWebsiteUrl() {
-  if (!window) return '';
+  if (!window) {
+    return '';
+  }
   return `${window.location.protocol}//${window.location.hostname}`;
 }
 
 /** 获取路由参数 */
 export function getRouterParams() {
   const params = new URLSearchParams(window.location.search);
-  if (!params.size) return;
+  if (!params.size) {
+    return;
+  }
   const result: Recordable = {};
   for (const [key, value] of params.entries()) {
     result[key] = value;
@@ -122,7 +122,9 @@ export function getRouterParams() {
 
 /** 去除字符串里的所有空字符 */
 export function removeWhitespace(str: any) {
-  if (!is.isString(str)) return '';
+  if (!is.isString(str)) {
+    return '';
+  }
   return str.replace(/\s+/g, '');
 }
 
@@ -130,9 +132,7 @@ export function removeWhitespace(str: any) {
 export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
   let key: string;
   for (key in target) {
-    src[key] = is.isObject(src[key])
-      ? deepMerge(src[key], target[key])
-      : (src[key] = target[key]);
+    src[key] = is.isObject(src[key]) ? deepMerge(src[key], target[key]) : (src[key] = target[key]);
   }
   return src;
 }
@@ -159,10 +159,14 @@ export function desensitization(
     middleStr?: string;
   } = {}
 ) {
-  if (!is.isString(str) && !is.isNumber(str)) return str;
+  if (!is.isString(str) && !is.isNumber(str)) {
+    return str;
+  }
   const val = String(str);
   const len = val?.length ?? 0;
-  if (!val || !len || number <= 0) return val;
+  if (!val || !len || number <= 0) {
+    return val;
+  }
   const prefix = showPrefix ? val.substring(0, number) : '';
   const suffix = showSuffix ? val.substring(len - number) : '';
   return `${prefix}${middleStr}${suffix}`;
@@ -173,14 +177,20 @@ export function desensitization(
  * @param unit 单位，default: 'px'
  */
 export function toStyleUnit(str?: string | number | null, unit = 'px') {
-  if (str === null || str === '' || str === void 0) return void 0;
+  if (str === null || str === '' || str === void 0) {
+    return void 0;
+  }
   return JKMath.isNanValue(str) ? String(str) : `${JKMath.toNum(str)}${unit}`;
 }
 
 /** 数字转为样式对象 */
 export function toStyleObject(style?: string | Recordable | null) {
-  if (!style) return {};
-  if (is.isObject(style)) return style;
+  if (!style) {
+    return {};
+  }
+  if (is.isObject(style)) {
+    return style;
+  }
   return style.split(';').reduce((obj, declaration) => {
     const [property, value] = declaration.trim().split(':');
     if (property) {

@@ -4,7 +4,9 @@ import { getWebsiteUrl, isInMobileBrowser, withInstall } from '~/utils';
 
 /** 跳转Telegram身份检查 */
 export function toTelegramAuth(botId: number, toPath: string) {
-  if (!botId || !toPath) return;
+  if (!botId || !toPath) {
+    return;
+  }
   const httpUrl = encodeURIComponent(getWebsiteUrl());
   const routerUrl = encodeURIComponent(toPath);
   const url = `https://oauth.telegram.org/auth?bot_id=${botId}&origin=${httpUrl}&embed=1&request_access=write&return_to=${httpUrl}${routerUrl}`;
@@ -13,7 +15,7 @@ export function toTelegramAuth(botId: number, toPath: string) {
 
 /** 获取路由中的Telegram身份检查回调参数 */
 export function getTelegramAuthUrlParams(): TgUserData | null {
-  const re = /[#\?\&]tgAuthResult=([A-Za-z0-9\-_=]*)$/;
+  const re = /[#?&]tgAuthResult=([A-Za-z0-9\-_=]*)$/;
   try {
     const locationHash = window.location.hash.toString();
     const match = locationHash.match(re);
@@ -23,7 +25,9 @@ export function getTelegramAuthUrlParams(): TgUserData | null {
     window.location.hash = locationHash.replace(re, '');
     let data = match[1].replace(/-/g, '+').replace(/_/g, '/');
     const pad = data.length % 4;
-    if (pad > 1) data += new Array(5 - pad).join('=');
+    if (pad > 1) {
+      data += new Array(5 - pad).join('=');
+    }
     return data ? JSON.parse(window.atob(data)) : null;
   } catch {
     return null;
@@ -116,16 +120,13 @@ const Telegram = defineComponent<TelegramAuthProps>({
         toTelegramAuth(id || 0, path || '');
         return;
       }
-      getClientFn()?.(
-        { bot_id: id, request_access: true },
-        (data: TgUserData) => {
-          if (data) {
-            props.onCallback?.(data);
-          } else {
-            props.onRejectCallback?.();
-          }
+      getClientFn()?.({ bot_id: id, request_access: true }, (data: TgUserData) => {
+        if (data) {
+          props.onCallback?.(data);
+        } else {
+          props.onRejectCallback?.();
         }
-      );
+      });
     }
 
     onMounted(() => {
