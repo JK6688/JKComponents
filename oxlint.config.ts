@@ -11,15 +11,7 @@ export default defineConfig({
     browser: true,
     node: true
   },
-  ignorePatterns: [
-    'node_modules/**',
-    '.vscode/**',
-    'dist/**',
-    'public/**',
-    '**/*.sh',
-    '**/*.md',
-    'src/api/apis.ts'
-  ],
+  ignorePatterns: ['node_modules/**', '.vscode/**', 'dist/**', '**/*.md'],
   rules: {
     'constructor-super': 'error',
     'for-direction': 'error',
