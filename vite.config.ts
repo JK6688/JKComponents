@@ -39,17 +39,16 @@ export default () => {
       dts({
         outDir: 'dist',
         entryRoot: 'src',
-        include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.vue'],
-        // rollupTypes: false, 
-        beforeWriteFile: (filePath, content) => {
-          return { filePath, content };
-        }
+        staticImport: true,
+        insertTypesEntry: true,
+        cleanVueFileName: true,
+        copyDtsFiles: false,
+        strictOutput: true,
+        tsconfigPath: './tsconfig.json'
       })
     ],
     resolve: {
-      alias: {
-        '~': '/src'
-      }
+      alias: { '~': '/src' }
     },
     build: {
       lib: {

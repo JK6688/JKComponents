@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "jk-vue-comps",
   "type": "module",
   "main": "dist/index.js",
@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "pnpm delete:dist && vue-tsc && vite build",
     "preview": "vite preview",
     "ts:check": "tsc --project tsconfig.json --noEmitOnError",
     "delete:lib": "rimraf pnpm-lock.yaml node_modules",
