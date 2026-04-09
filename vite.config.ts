@@ -38,10 +38,12 @@ export default () => {
       vueJsx(),
       dts({
         outDir: 'dist',
-        staticImport: true,
-        insertTypesEntry: true,
-        cleanVueFileName: true,
-        copyDtsFiles: false
+        entryRoot: 'src',
+        include: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.vue'],
+        // rollupTypes: false, 
+        beforeWriteFile: (filePath, content) => {
+          return { filePath, content };
+        }
       })
     ],
     resolve: {
