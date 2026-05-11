@@ -37,7 +37,7 @@ export default () => {
       vue(),
       vueJsx(),
       dts({
-        outDir: 'dist',
+        outDirs: 'dist',
         entryRoot: 'src',
         staticImport: true,
         insertTypesEntry: true,
