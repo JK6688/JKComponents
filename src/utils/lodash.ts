@@ -1,3 +1,5 @@
+import BJS from 'bignumber.js';
+
 function _unwrap<T>(val: T): T {
   if (val === null || typeof val !== 'object') {
     return val;
@@ -21,6 +23,14 @@ export function clone<T>(value: T): T {
 
   if (actualValue === null || typeof actualValue !== 'object') {
     return actualValue;
+  }
+
+  if ((actualValue as any).$d && typeof (actualValue as any).clone === 'function') {
+    return (actualValue as any).clone() as any;
+  }
+
+  if (BJS.isBigNumber(actualValue)) {
+    return new (actualValue as any).constructor(actualValue) as any;
   }
 
   if (Array.isArray(actualValue)) {
@@ -57,8 +67,16 @@ export function cloneDeep<T>(target: T, map = new WeakMap<object, any>()): T {
     return actualTarget;
   }
 
+  if ((actualTarget as any).$d && typeof (actualTarget as any).clone === 'function') {
+    return (actualTarget as any).clone() as any;
+  }
+
+  if (BJS.isBigNumber(actualTarget)) {
+    return new (actualTarget as any).constructor(actualTarget) as any;
+  }
+
   if (actualTarget instanceof Date) {
-    return new Date(actualTarget) as any;
+    return new Date(actualTarget.getTime()) as any;
   }
   if (actualTarget instanceof RegExp) {
     return new RegExp(actualTarget.source, actualTarget.flags) as any;
@@ -87,14 +105,16 @@ export function cloneDeep<T>(target: T, map = new WeakMap<object, any>()): T {
   } else if (Object.prototype.toString.call(actualTarget) === '[object Object]') {
     cloneTarget = {};
   } else {
-    return actualTarget;
+    const proto = Object.getPrototypeOf(actualTarget);
+    cloneTarget = Object.create(proto);
   }
 
   map.set(actualTarget as object, cloneTarget);
 
   const keys = Array.isArray(actualTarget) ? void 0 : Object.keys(actualTarget as object);
+  const targetToIterate = keys || (actualTarget as any);
 
-  (keys || (actualTarget as any)).forEach((val: any, key: any) => {
+  targetToIterate.forEach((val: any, key: any) => {
     const actualKey = keys ? val : key;
     try {
       cloneTarget[actualKey] = cloneDeep((actualTarget as any)[actualKey], map);
