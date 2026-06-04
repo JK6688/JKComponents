@@ -1,13 +1,13 @@
 import type { ComponentPublicInstance, FunctionalComponent, VNode } from 'vue';
 
 declare global {
-  declare type Nullable<T> = T | null;
+  type Nullable<T> = T | null;
 
-  declare type NonNullable<T> = T extends null | undefined ? never : T;
+  type NonNullable<T> = T extends null | undefined ? never : T;
 
-  declare type Recordable<T = any> = Record<string, T>;
+  type Recordable<T = any> = Record<string, T>;
 
-  declare interface ChangeEvent extends Event {
+  interface ChangeEvent extends Event {
     target: HTMLInputElement;
   }
 
