@@ -281,7 +281,12 @@ export function isEqual(value: any, other: any): boolean {
     return true;
   }
 
-  if (typeof value === 'number' && typeof other === 'number' && isNaN(value) && isNaN(other)) {
+  if (
+    typeof value === 'number' &&
+    typeof other === 'number' &&
+    Number.isNaN(value) &&
+    Number.isNaN(other)
+  ) {
     return true;
   }
 

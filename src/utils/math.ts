@@ -1,5 +1,7 @@
 import BJS from 'bignumber.js';
 
+BJS.config({ STRICT: false });
+
 export type BigNumVal = BJS.Value;
 
 export type BigNumValType = BigNumVal | undefined | null | boolean;
@@ -41,14 +43,19 @@ export function isBigNum(val: any): val is BigNumObj {
 
 /** 是否为数字 */
 export function isNum(val: any): val is number {
-  return typeof val === 'number' && !isNanValue(val);
+  return typeof val === 'number' && !isNan(val);
 }
 
 /** 是否为NaN值(传入任意值转bignumber是否为NaN) */
-export function isNanValue(val: any) {
+export function isNan(val: any) {
   if (val == null || val == void 0) {
     return false;
   }
+
+  if (typeof val === 'string' && Number.isNaN(Number(val))) {
+    return true;
+  }
+
   return BJS(val).isNaN();
 }
 
@@ -242,5 +249,3 @@ export const lt = isLessThan;
 export const lte = isLessThanOrEqualTo;
 
 export const eq = isEqualTo;
-
-export const isNan = isNanValue;

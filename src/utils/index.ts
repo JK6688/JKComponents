@@ -180,7 +180,7 @@ export function toStyleUnit(str?: string | number | null, unit = 'px') {
   if (str === null || str === '' || str === void 0) {
     return void 0;
   }
-  return JKMath.isNanValue(str) ? String(str) : `${JKMath.toNum(str)}${unit}`;
+  return JKMath.isNan(str) ? String(str) : `${JKMath.toNum(str)}${unit}`;
 }
 
 /** 数字转为样式对象 */
