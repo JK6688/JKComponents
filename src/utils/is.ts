@@ -173,10 +173,9 @@ export function isInMobileBrowser() {
 
 /** 是否中文 */
 export function isZhLang(lang: string) {
-  const _lang = lang?.replace(/\s+/g, '')?.toUpperCase?.();
-  const zhMap = ['ZH-CN', 'ZH_CH', 'ZH'];
-  const enMap = ['EN', 'EN-US'];
-  return zhMap.some((x) => x === _lang) || !enMap.some((x) => x === _lang);
+  const _lang = lang?.replace(/\s+/g, '')?.toUpperCase?.()?.replace(/_/g, '-');
+  const zhMap = ['ZH-CN', 'zh', 'zh-Hans', 'zh', 'zh_HK', 'zh-HK', 'zh-MO', 'zh-SG', 'hk', 'tw'];
+  return zhMap.some((x) => x.toUpperCase() === _lang);
 }
 
 /** 是否Edge浏览器 */

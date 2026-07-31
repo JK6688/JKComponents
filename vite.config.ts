@@ -2,12 +2,12 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import dts from 'vite-plugin-dts';
-import { resolve } from 'path';
-import { readdirSync } from 'fs';
+import { resolve } from 'node:path';
+import { readdirSync } from 'node:fs';
 
 function getEntries(url: string) {
   const req = /\.(ts|tsx)$/;
-  const utilsDir = resolve(__dirname, url);
+  const utilsDir = resolve(import.meta.dirname, url);
   const files = readdirSync(utilsDir).filter((file) => req.test(file));
 
   const folders = url.replace(/^src\//, '');
@@ -31,48 +31,48 @@ function fileName(name: string, type: 'hash' | 'name' = 'name') {
   return `${prefix}[name]${type === 'hash' ? '-[hash]' : ''}.js`;
 }
 
-export default () => {
-  return defineConfig({
-    plugins: [
-      vue(),
-      vueJsx(),
-      dts({
-        outDirs: 'dist',
-        entryRoot: 'src',
-        staticImport: true,
-        insertTypesEntry: true,
-        cleanVueFileName: true,
-        copyDtsFiles: false,
-        strictOutput: true,
-        tsconfigPath: './tsconfig.json'
-      })
-    ],
-    resolve: {
-      alias: { '~': '/src' }
-    },
-    build: {
-      lib: {
-        name: 'JKVUEComps',
-        entry: {
-          index: resolve(__dirname, 'src/index'),
-          ...getEntries('src/components'),
-          ...getEntries('src/hooks'),
-          ...getEntries('src/utils')
-        },
-        fileName: (module) => fileName(module, 'name'),
-        formats: ['es']
+export default defineConfig({
+  plugins: [
+    vue(),
+    vueJsx(),
+    dts({
+      outDirs: 'dist',
+      entryRoot: 'src',
+      staticImport: true,
+      insertTypesEntry: true,
+      cleanVueFileName: true,
+      copyDtsFiles: false,
+      strictOutput: true,
+      tsconfigPath: './tsconfig.json'
+    })
+  ],
+  resolve: {
+    alias: {
+      '~': resolve(import.meta.dirname, 'src')
+    }
+  },
+  build: {
+    lib: {
+      name: 'JKVUEComps',
+      entry: {
+        index: resolve(import.meta.dirname, 'src/index'),
+        ...getEntries('src/components'),
+        ...getEntries('src/hooks'),
+        ...getEntries('src/utils')
       },
-      rollupOptions: {
-        external: ['vue', 'vue-types'],
-        output: {
-          exports: 'named',
-          globals: {
-            vue: 'Vue',
-            'vue-types': 'VueTypes'
-          },
-          chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash')
-        }
+      fileName: (module) => fileName(module, 'name'),
+      formats: ['es']
+    },
+    rollupOptions: {
+      external: ['vue', 'vue-types'],
+      output: {
+        exports: 'named',
+        globals: {
+          vue: 'Vue',
+          'vue-types': 'VueTypes'
+        },
+        chunkFileNames: (chunkInfo) => fileName(chunkInfo.name, 'hash')
       }
     }
-  });
-};
+  }
+});
