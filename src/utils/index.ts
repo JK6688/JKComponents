@@ -66,14 +66,14 @@ export function filterInputNum(
  * @param type 输入类型，int整数，float，default: 'int'
  * @param maxDecimal 最大小数位，default: 6
  */
-export function generateFilterInputNumFn<T extends Recordable, K extends keyof T>(
+export function generateFilterInputNumFn<T extends Record<string, any>, K extends keyof T>(
   obj: T,
   key: K,
   fn?: () => void,
   type: 'float' | 'int' = 'int',
   maxDecimal = 6
 ) {
-  return (e: ChangeEvent) => {
+  return (e: Event & { target: HTMLInputElement }) => {
     const oldVal = e?.target?.value ?? obj[key];
 
     const nextVal = filterInputNum(oldVal, type, maxDecimal) as T[K];
@@ -113,7 +113,7 @@ export function getRouterParams() {
   if (!params.size) {
     return;
   }
-  const result: Recordable = {};
+  const result: Record<string, any> = {};
   for (const [key, value] of params.entries()) {
     result[key] = value;
   }
@@ -184,20 +184,23 @@ export function toStyleUnit(str?: string | number | null, unit = 'px') {
 }
 
 /** 数字转为样式对象 */
-export function toStyleObject(style?: string | Recordable | null) {
+export function toStyleObject(style?: string | Record<string, any> | null) {
   if (!style) {
     return {};
   }
   if (is.isObject(style)) {
     return style;
   }
-  return style.split(';').reduce((obj, declaration) => {
-    const [property, value] = declaration.trim().split(':');
-    if (property) {
-      const name = property.trim();
-      const key = name.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
-      obj[key] = value.trim();
-    }
-    return obj;
-  }, {} as Recordable);
+  return style.split(';').reduce(
+    (obj, declaration) => {
+      const [property, value] = declaration.trim().split(':');
+      if (property) {
+        const name = property.trim();
+        const key = name.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
+        obj[key] = value.trim();
+      }
+      return obj;
+    },
+    {} as Record<string, any>
+  );
 }

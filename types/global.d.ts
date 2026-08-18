@@ -1,18 +1,8 @@
-import type { ComponentPublicInstance, FunctionalComponent, VNode } from 'vue';
+export { };
 
 declare global {
-  type Nullable<T> = T | null;
-
-  type NonNullable<T> = T extends null | undefined ? never : T;
-
-  type Recordable<T = any> = Record<string, T>;
-
-  interface ChangeEvent extends Event {
-    target: HTMLInputElement;
-  }
-
   namespace JSX {
-    type Element = VNode;
+    type Element = import('vue').VNode;
 
     interface ElementAttributesProperty {
       $props: any;
@@ -24,10 +14,4 @@ declare global {
       [elem: string]: any;
     }
   }
-}
-
-declare module 'vue' {
-  export type JSXComponent<Props = any> =
-    | { new (): ComponentPublicInstance<Props> }
-    | FunctionalComponent<Props>;
 }
