@@ -75,7 +75,7 @@ export function isGreaterThan(num1: BigNumVal, num2: BigNumVal) {
 }
 
 /** 是否小于
- * @example isLessThan('123', 132) => true
+ * @example isLessThan('12', 132) => true
  */
 export function isLessThan(num1: BigNumVal, num2: BigNumVal) {
   return helper(num1).isLessThan(helper(num2));
