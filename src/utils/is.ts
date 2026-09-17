@@ -120,14 +120,29 @@ export function isClient() {
 }
 
 /** 是否url */
-export function isUrl(path: string): boolean {
+export function isUrl(url: string) {
+  if (!url) {
+    return false;
+  }
   const reg =
     /^(((^https?:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?(\/#\/)?(?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
-  return reg.test(path);
+  return reg.test(url);
+}
+
+/** 是否Http url */
+export function isHttpUrl(url: string) {
+  if (!url) {
+    return false;
+  }
+  const normalized = url.replace(/\s/g, '').toLowerCase();
+  return !/^[a-z][a-z0-9+.-]*:/.test(normalized) || /^https?:/.test(normalized);
 }
 
 /** 是否Ip */
 export function isIp(ip: string) {
+  if (!ip) {
+    return false;
+  }
   return /\b(?:\d{1,3}.){3}\d{1,3}\b/.test(ip);
 }
 
@@ -148,6 +163,9 @@ export function isEmail(v: any) {
 
 /** 是否号码 */
 export function isValidPhoneNumber(phoneNumber: string) {
+  if (!phoneNumber) {
+    return false;
+  }
   const mobileRegex = /^1[3456789]\d{9}$/;
 
   const landlineRegex = /^(\d{3,4}-)?\d{7,8}$/;
