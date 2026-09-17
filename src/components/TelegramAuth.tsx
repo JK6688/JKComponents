@@ -1,10 +1,10 @@
 import { defineComponent, onMounted, computed } from 'vue';
-import type { SlotsType, PropType, ExtractPropTypes } from 'vue';
-import { getWebsiteUrl, isInMobileBrowser, withInstall } from '~/utils';
+import type { SlotsType, PropType, ExtractPropTypes, Plugin } from 'vue';
+import { getWebsiteUrl, isInMobileBrowser, isServer, withInstall } from '~/utils';
 
 /** 跳转Telegram身份检查 */
 export function toTelegramAuth(botId: number, toPath: string) {
-  if (!botId || !toPath) {
+  if (!botId || !toPath || isServer()) {
     return;
   }
   const httpUrl = encodeURIComponent(getWebsiteUrl());
@@ -15,6 +15,9 @@ export function toTelegramAuth(botId: number, toPath: string) {
 
 /** 获取路由中的Telegram身份检查回调参数 */
 export function getTelegramAuthUrlParams(): TgUserData | null {
+  if (isServer()) {
+    return null;
+  }
   const re = /[#?&]tgAuthResult=([A-Za-z0-9\-_=]*)$/;
   try {
     const locationHash = window.location.hash.toString();
@@ -58,6 +61,8 @@ const _comp_props = {
 
 export type TelegramAuthProps = Partial<ExtractPropTypes<typeof _comp_props>>;
 
+export type TelegramAuthExpose = { startCheck: () => Promise<void> };
+
 const Telegram = defineComponent<TelegramAuthProps>({
   name: 'TelegramAuth',
   toTelegramAuth,
@@ -78,32 +83,42 @@ const Telegram = defineComponent<TelegramAuthProps>({
 
     function getSetupEl() {
       const _el = props.getPopupContainer?.();
-      return _el || document.body;
+      return _el || (isServer() ? null : document.body);
     }
 
+    // 多个 startCheck 并发调用时只插入一个 script 标签
+    let scriptPromise: Promise<boolean> | null = null;
+
     function setupScript() {
-      return new Promise<boolean>((resolve) => {
-        if (!document) {
-          resolve(false);
-          return;
-        }
-        if (isInMobileBrowser() || getClientFn()) {
-          resolve(true);
-          return;
-        }
+      if (isServer()) {
+        return Promise.resolve(false);
+      }
+      if (isInMobileBrowser() || getClientFn()) {
+        return Promise.resolve(true);
+      }
+      if (scriptPromise) {
+        return scriptPromise;
+      }
+      scriptPromise = new Promise<boolean>((resolve) => {
         const script = document.createElement('script');
         script.async = true;
         script.defer = true;
         script.src = 'https://telegram.org/js/telegram-widget.js';
         getSetupEl()?.appendChild?.(script);
         script.onload = () => {
-          resolve(!!getClientFn());
+          const loaded = !!getClientFn();
+          if (!loaded) {
+            scriptPromise = null;
+          }
+          resolve(loaded);
         };
         script.onerror = () => {
           script.remove();
+          scriptPromise = null;
           resolve(false);
         };
       });
+      return scriptPromise;
     }
 
     async function startCheck() {
@@ -147,6 +162,7 @@ type C = typeof Telegram & {
 };
 
 /** Telegram身份检查 */
-export const TelegramAuth = withInstall<C>(Telegram as C);
+export const TelegramAuth = withInstall<C>(Telegram as C) as unknown as C &
+  Plugin & { new (...args: any[]): InstanceType<C> & TelegramAuthExpose };
 
 export default TelegramAuth;

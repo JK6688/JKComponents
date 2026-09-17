@@ -252,6 +252,11 @@ export function set<T>(obj: T, path: string | number, value: any): T {
     .split('.')
     .filter(Boolean);
 
+  // 空路径会写入名为 "undefined" 的 key；__proto__ / constructor / prototype 会造成原型链污染
+  if (!segments.length || segments.some((seg) => !_isSafeKey(seg))) {
+    return obj;
+  }
+
   let current: any = obj;
 
   for (let i = 0; i < segments.length - 1; i++) {
@@ -275,8 +280,21 @@ export function isNil(value: any): value is null | undefined {
   return value == null;
 }
 
-/** 代替lodash.isEqual */
-export function isEqual(value: any, other: any): boolean {
+/** 原型是否是「普通对象」原型（用于兼容跨 realm 的普通对象） */
+function _isPlainProto(proto: object | null) {
+  if (proto === null) {
+    return true;
+  }
+  const ctor = (proto as any).constructor;
+  return ctor === Object || ctor?.name === 'Object';
+}
+
+function _isEqual(value: any, other: any, stack: WeakMap<object, object>): boolean {
+  // +0 与 -0 不相等（与 lodash 保持一致）；必须放在 === 之前判断，因为 0 === -0 是 true
+  if (value === 0 && other === 0) {
+    return 1 / value === 1 / other;
+  }
+
   if (value === other) {
     return true;
   }
@@ -297,11 +315,66 @@ export function isEqual(value: any, other: any): boolean {
   if (Object.prototype.toString.call(value) !== Object.prototype.toString.call(other)) {
     return false;
   }
+
+  // 环引用：这一对对象正在比较中，直接认为相等，避免无限递归爆栈
+  if (stack.get(value) === other) {
+    return true;
+  }
+  stack.set(value, other);
+
   if (value instanceof Date) {
     return value.getTime() === other.getTime();
   }
   if (value instanceof RegExp) {
     return value.toString() === other.toString();
+  }
+
+  if (value instanceof Map) {
+    if (value.size !== other.size) {
+      return false;
+    }
+    for (const [key, val] of value) {
+      if (other.has(key)) {
+        if (!_isEqual(val, other.get(key), stack)) {
+          return false;
+        }
+        continue;
+      }
+      // 对象 key 无法用 has 命中，退回深比较
+      let found = false;
+      for (const [otherKey, otherVal] of other) {
+        if (_isEqual(key, otherKey, stack) && _isEqual(val, otherVal, stack)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  if (value instanceof Set) {
+    if (value.size !== other.size) {
+      return false;
+    }
+    for (const item of value) {
+      if (other.has(item)) {
+        continue;
+      }
+      let found = false;
+      for (const candidate of other) {
+        if (_isEqual(item, candidate, stack)) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        return false;
+      }
+    }
+    return true;
   }
 
   const isArrValue = Array.isArray(value);
@@ -315,11 +388,18 @@ export function isEqual(value: any, other: any): boolean {
       return false;
     }
     for (let i = 0; i < value.length; i++) {
-      if (!isEqual(value[i], other[i])) {
+      if (!_isEqual(value[i], other[i], stack)) {
         return false;
       }
     }
     return true;
+  }
+
+  // 原型不同（不同类实例）不相等，跨 realm 的普通对象除外
+  const protoValue = Object.getPrototypeOf(value);
+  const protoOther = Object.getPrototypeOf(other);
+  if (protoValue !== protoOther && !(_isPlainProto(protoValue) && _isPlainProto(protoOther))) {
+    return false;
   }
 
   const keysA = Object.keys(value);
@@ -330,12 +410,40 @@ export function isEqual(value: any, other: any): boolean {
   }
 
   for (const key of keysA) {
-    if (!Object.prototype.hasOwnProperty.call(other, key) || !isEqual(value[key], other[key])) {
+    if (
+      !Object.prototype.hasOwnProperty.call(other, key) ||
+      !_isEqual(value[key], other[key], stack)
+    ) {
+      return false;
+    }
+  }
+
+  const symbolsA = Object.getOwnPropertySymbols(value).filter((sym) =>
+    Object.prototype.propertyIsEnumerable.call(value, sym)
+  );
+  const symbolsB = Object.getOwnPropertySymbols(other).filter((sym) =>
+    Object.prototype.propertyIsEnumerable.call(other, sym)
+  );
+
+  if (symbolsA.length !== symbolsB.length) {
+    return false;
+  }
+
+  for (const sym of symbolsA) {
+    if (
+      !Object.prototype.hasOwnProperty.call(other, sym) ||
+      !_isEqual(value[sym], other[sym], stack)
+    ) {
       return false;
     }
   }
 
   return true;
+}
+
+/** 代替lodash.isEqual（支持 Map/Set/环引用/符号 key，且不同类实例不相等） */
+export function isEqual(value: any, other: any): boolean {
+  return _isEqual(value, other, new WeakMap<object, object>());
 }
 
 /** 代替lodash.uniq */
@@ -379,6 +487,13 @@ export function upperFirst(str: string | null | undefined) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/** 会造成原型链污染的 key，写入前一律跳过 */
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
+function _isSafeKey(key: string | symbol) {
+  return typeof key === 'symbol' || !UNSAFE_KEYS.has(key);
+}
+
 function _isObject(item: any): item is Record<string, any> {
   return item !== null && typeof item === 'object' && !Array.isArray(item);
 }
@@ -393,7 +508,7 @@ export function merge<T extends object, S extends object[]>(target: T, ...source
 
   if (_isObject(target) && _isObject(source)) {
     for (const key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
+      if (Object.prototype.hasOwnProperty.call(source, key) && _isSafeKey(key)) {
         const sourceValue = source[key];
         const targetValue = target[key as keyof T];
 

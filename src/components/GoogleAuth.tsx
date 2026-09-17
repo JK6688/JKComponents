@@ -1,10 +1,10 @@
 import { defineComponent, computed, onMounted } from 'vue';
-import type { SlotsType, PropType, ExtractPropTypes } from 'vue';
-import { isInMobileBrowser, withInstall } from '~/utils';
+import type { SlotsType, PropType, ExtractPropTypes, Plugin } from 'vue';
+import { isInMobileBrowser, isServer, withInstall } from '~/utils';
 
 /** 跳转谷歌身份检查 */
 export function toGoogleAuth(clientId: string, redirectUri: string) {
-  if (!clientId || !redirectUri) {
+  if (!clientId || !redirectUri || isServer()) {
     return;
   }
   const uri = encodeURIComponent(redirectUri);
@@ -27,6 +27,8 @@ const _comp_props = {
 
 export type GoogleAuthProps = Partial<ExtractPropTypes<typeof _comp_props>>;
 
+export type GoogleAuthExpose = { startCheck: () => Promise<void> };
+
 const Google = defineComponent<GoogleAuthProps>({
   name: 'GoogleAuth',
   toGoogleAuth,
@@ -46,32 +48,42 @@ const Google = defineComponent<GoogleAuthProps>({
 
     function getSetupEl() {
       const _el = props.getPopupContainer?.();
-      return _el || document.body;
+      return _el || (isServer() ? null : document.body);
     }
 
+    // 多个 startCheck 并发调用时只插入一个 script 标签
+    let scriptPromise: Promise<boolean> | null = null;
+
     function setupScript() {
-      return new Promise<boolean>((resolve) => {
-        if (!document) {
-          resolve(false);
-          return;
-        }
-        if (isInMobileBrowser() || getClientFn()) {
-          resolve(true);
-          return;
-        }
+      if (isServer()) {
+        return Promise.resolve(false);
+      }
+      if (isInMobileBrowser() || getClientFn()) {
+        return Promise.resolve(true);
+      }
+      if (scriptPromise) {
+        return scriptPromise;
+      }
+      scriptPromise = new Promise<boolean>((resolve) => {
         const script = document.createElement('script');
         script.async = true;
         script.defer = true;
         script.src = 'https://accounts.google.com/gsi/client';
         getSetupEl()?.appendChild?.(script);
         script.onload = () => {
-          resolve(!!getClientFn());
+          const loaded = !!getClientFn();
+          if (!loaded) {
+            scriptPromise = null;
+          }
+          resolve(loaded);
         };
         script.onerror = () => {
           script.remove();
+          scriptPromise = null;
           resolve(false);
         };
       });
+      return scriptPromise;
     }
 
     async function startCheck() {
@@ -119,6 +131,7 @@ const Google = defineComponent<GoogleAuthProps>({
 type C = typeof Google & { readonly toGoogleAuth: typeof toGoogleAuth };
 
 /** 谷歌身份检查 */
-export const GoogleAuth = withInstall<C>(Google as C);
+export const GoogleAuth = withInstall<C>(Google as C) as unknown as C &
+  Plugin & { new (...args: any[]): InstanceType<C> & GoogleAuthExpose };
 
 export default GoogleAuth;

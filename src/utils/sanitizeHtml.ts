@@ -158,6 +158,9 @@ const RES_URL_ATTRS = new Set(['src']);
 const SPACE_CODE = 0x20;
 const DEL_CODE = 0x7f;
 
+/** 子树递归深度上限：超深嵌套会让递归爆栈，超过就直接丢掉该子树（丢内容好过整段失败） */
+const MAX_DEPTH = 500;
+
 /**
  * 剥掉控制字符与空白
  *
@@ -221,7 +224,7 @@ function cleanAttributes(el: Element, tag: string) {
   }
 }
 
-function cleanSubtree(parent: Element) {
+function cleanSubtree(parent: Element, depth = 0) {
   Array.from(parent.childNodes).forEach((node) => {
     if (node.nodeType === COMMENT_NODE) {
       node.remove();
@@ -241,8 +244,14 @@ function cleanSubtree(parent: Element) {
       return;
     }
 
+    // 超出深度上限：无法再安全递归，直接丢掉这棵子树
+    if (depth >= MAX_DEPTH) {
+      el.remove();
+      return;
+    }
+
     // 先清理子树，再决定当前标签去留，避免解包时把未净化的节点搬出去
-    cleanSubtree(el);
+    cleanSubtree(el, depth + 1);
 
     if (!ALLOW_TAGS.has(tag)) {
       // 不在白名单但本身无危险：解包，保留子节点，尽量不丢内容

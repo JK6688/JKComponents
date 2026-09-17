@@ -64,7 +64,7 @@ export function isRegExp(val: unknown): val is RegExp {
 
 /** 是否数组 */
 export function isArray(val: any): val is Array<any> {
-  return val && Array.isArray(val);
+  return !!val && Array.isArray(val);
 }
 
 /** 是否空 */
@@ -99,9 +99,10 @@ export function isWindow(val: any): val is Window {
   return typeof window !== 'undefined' && is(val, 'Window');
 }
 
-/** 是否Element */
+/** 是否Element（DOM 节点的 `Object.prototype.toString` 是 `[object HTMLDivElement]` 这种值，
+ * 所以不能用 isObject 判断，只能看 nodeType） */
 export function isElement(val: unknown): val is Element {
-  return isObject(val) && !!val.tagName;
+  return typeof val === 'object' && val !== null && (val as Element).nodeType === 1;
 }
 
 /** 是否Map */
@@ -138,12 +139,16 @@ export function isHttpUrl(url: string) {
   return !/^[a-z][a-z0-9+.-]*:/.test(normalized) || /^https?:/.test(normalized);
 }
 
-/** 是否Ip */
+/** 是否Ip（四段，每段 0-255） */
 export function isIp(ip: string) {
-  if (!ip) {
+  if (!ip || typeof ip !== 'string') {
     return false;
   }
-  return /\b(?:\d{1,3}.){3}\d{1,3}\b/.test(ip);
+  const parts = ip.trim().split('.');
+  if (parts.length !== 4) {
+    return false;
+  }
+  return parts.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255);
 }
 
 /** 是否邮箱 */
@@ -185,19 +190,38 @@ export function isValidPhoneNumber(phoneNumber: string) {
 export function isInMobileBrowser() {
   return (
     typeof navigator !== 'undefined' &&
-    navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i)
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent)
   );
 }
 
+/** 中文（简体/繁体）语言标识，大小写与 `-`/`_` 不敏感 */
+const ZH_LANG_SET = new Set([
+  'ZH',
+  'ZH-CN',
+  'ZH-HANS',
+  'ZH-HANT',
+  'ZH-HK',
+  'ZH-MO',
+  'ZH-SG',
+  'ZH-TW',
+  'HK',
+  'TW'
+]);
+
 /** 是否中文 */
 export function isZhLang(lang: string) {
-  const _lang = lang?.replace(/\s+/g, '')?.toUpperCase?.()?.replace(/_/g, '-');
-  const zhMap = ['ZH-CN', 'zh', 'zh-Hans', 'zh', 'zh_HK', 'zh-HK', 'zh-MO', 'zh-SG', 'hk', 'tw'];
-  return zhMap.some((x) => x.toUpperCase() === _lang);
+  if (!lang) {
+    return false;
+  }
+  const _lang = lang.replace(/\s+/g, '').toUpperCase().replace(/_/g, '-');
+  return ZH_LANG_SET.has(_lang);
 }
 
 /** 是否Edge浏览器 */
 export function isEdgeBrowser() {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
   if (navigator.userAgent.indexOf('Edge') > -1) {
     return true;
   }
@@ -212,5 +236,5 @@ export function isEdgeBrowser() {
 
 /** 是否html字符串 */
 export function isHtmlStr(str: string) {
-  return isString(str) && /<[^>]+>/g.test(str);
+  return isString(str) && /<[^>]+>/.test(str);
 }

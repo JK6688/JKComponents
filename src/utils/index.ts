@@ -80,10 +80,16 @@ export function generateFilterInputNumFn<T extends Record<string, any>, K extend
 
     const nextVal = filterInputNum(oldVal, type, maxDecimal) as T[K];
 
-    if (nextVal !== oldVal) {
-      if (e?.target && Object.prototype.hasOwnProperty.call(e.target, 'value')) {
-        e.target.value = nextVal;
-      }
+    // 输入框和模型各判一次：只判输入框会漏掉「用户清空输入」的场景
+    // （清空时 nextVal 与 oldVal 都是 ''，但模型里还留着旧值）
+    const needSyncInput = nextVal !== oldVal;
+    const needSyncModel = obj[key] !== nextVal;
+
+    if (needSyncInput && e?.target && Object.prototype.hasOwnProperty.call(e.target, 'value')) {
+      e.target.value = nextVal;
+    }
+
+    if (needSyncInput || needSyncModel) {
       nextTick(() => {
         obj[key] = nextVal;
         e?.target?.focus?.();
@@ -102,16 +108,19 @@ export function renderHtmlStr(html: string) {
   return innerHTML ? createVNode('div', { innerHTML }) : innerHTML;
 }
 
-/** 获取当前网站协议+域名 */
+/** 获取当前网站协议+域名（服务端渲染返回空串） */
 export function getWebsiteUrl() {
-  if (!window) {
+  if (is.isServer()) {
     return '';
   }
   return `${window.location.protocol}//${window.location.hostname}`;
 }
 
-/** 获取路由参数 */
+/** 获取路由参数（服务端渲染返回 undefined） */
 export function getRouterParams() {
+  if (is.isServer()) {
+    return;
+  }
   const params = new URLSearchParams(window.location.search);
   if (!params.size) {
     return;
@@ -131,23 +140,31 @@ export function removeWhitespace(str: any) {
   return str.replace(/\s+/g, '');
 }
 
-/** 深度合并 */
+/** 会造成原型链污染的 key，合并前一律跳过 */
+const UNSAFE_MERGE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
+/** 深度合并（只合并 target 自身的可枚举属性，不会污染原型链） */
 export function deepMerge<T = any>(src: any = {}, target: any = {}): T {
-  let key: string;
-  for (key in target) {
-    src[key] = is.isObject(src[key]) ? deepMerge(src[key], target[key]) : (src[key] = target[key]);
+  for (const key in target) {
+    if (!Object.prototype.hasOwnProperty.call(target, key) || UNSAFE_MERGE_KEYS.has(key)) {
+      continue;
+    }
+    src[key] = is.isObject(src[key]) ? deepMerge(src[key], target[key]) : target[key];
   }
   return src;
 }
 
 /** 字符串脱敏
  * @param str 值
- * @param number 可见的字符数，default: 6
+ * @param number 每侧可见的字符数上限，default: 6
  * @param options = {
  *  showPrefix 显示前缀字符，default: true
  *  showSuffix 显示后缀字符，default: true
  *  middleStr 中间的字符串，default: '****'
  * }
+ *
+ * 前后缀不会重叠：每侧实际可见 `min(number, floor((len - 1) / 2))`，
+ * 所以至少会有 1 个字符被 middleStr 遮住，短串（长度 ≤ 2）直接整体遮挡。
  */
 export function desensitization(
   str?: string | number,
@@ -170,8 +187,9 @@ export function desensitization(
   if (!val || !len || number <= 0) {
     return val;
   }
-  const prefix = showPrefix ? val.substring(0, number) : '';
-  const suffix = showSuffix ? val.substring(len - number) : '';
+  const visible = Math.min(number, Math.max(0, Math.floor((len - 1) / 2)));
+  const prefix = showPrefix ? val.substring(0, visible) : '';
+  const suffix = showSuffix ? val.substring(len - visible) : '';
   return `${prefix}${middleStr}${suffix}`;
 }
 
@@ -196,9 +214,14 @@ export function toStyleObject(style?: string | Record<string, any> | null) {
   }
   return style.split(';').reduce(
     (obj, declaration) => {
-      const [property, value] = declaration.trim().split(':');
-      if (property) {
-        const name = property.trim();
+      // 只按第一个冒号切分：值里本身可能带冒号（如 background: url(http://a/b.png)）
+      const colonIndex = declaration.indexOf(':');
+      if (colonIndex === -1) {
+        return obj;
+      }
+      const name = declaration.slice(0, colonIndex).trim();
+      const value = declaration.slice(colonIndex + 1);
+      if (name) {
         const key = name.replace(/-(\w)/g, (_, c) => (c ? c.toUpperCase() : ''));
         obj[key] = value.trim();
       }

@@ -6,21 +6,25 @@ export function useCopyToClipboard(initial?: string) {
   const isSuccessRef = ref(false);
   const copiedRef = ref(false);
 
+  // 不要用 flush: 'sync'：写剪贴板是同步阻塞操作，跟着输入逐字符触发会卡住输入框
   watch(
     clipboardRef,
     (str?: string) => {
-      if (isDef(str) && str !== '') {
-        try {
-          isSuccessRef.value = copyTextToClipboard(str);
-          copiedRef.value = true;
-        } catch (error) {
-          isSuccessRef.value = false;
-          copiedRef.value = false;
-          console.error('Copy failed:', error);
-        }
+      if (!isDef(str) || str === '') {
+        isSuccessRef.value = false;
+        copiedRef.value = false;
+        return;
+      }
+      try {
+        isSuccessRef.value = copyTextToClipboard(str);
+        copiedRef.value = true;
+      } catch (error) {
+        isSuccessRef.value = false;
+        copiedRef.value = false;
+        console.error('Copy failed:', error);
       }
     },
-    { immediate: !!initial, flush: 'sync' }
+    { immediate: !!initial }
   );
 
   return { clipboardRef, isSuccessRef, copiedRef };
@@ -29,11 +33,18 @@ export function useCopyToClipboard(initial?: string) {
 export function copyTextToClipboard(
   input: string,
   {
-    target = document.body
+    target
   }: {
     target?: HTMLElement;
   } = {}
 ) {
+  // 服务端渲染没有 document，直接返回失败而不是抛错
+  // 注意：默认值不能写成 `target = document.body`，参数默认值会在进入函数体前求值，守卫拦不住
+  if (typeof document === 'undefined') {
+    return false;
+  }
+  const container = target ?? document.body;
+
   const element = document.createElement('textarea');
   const previouslyFocusedElement = document.activeElement;
 
@@ -51,7 +62,7 @@ export function copyTextToClipboard(
 
   const originalRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
-  target.append(element);
+  container.append(element);
   element.select();
 
   element.selectionStart = 0;

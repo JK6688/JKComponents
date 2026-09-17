@@ -8,7 +8,7 @@ export function useMemo<T>(
   const cacheRef: Ref<T> = ref(getValue() as any);
 
   watch(condition, (next, pre) => {
-    if (shouldUpdate && !shouldUpdate(next, pre)) {
+    if (shouldUpdate && !shouldUpdate(pre, next)) {
       return;
     }
     cacheRef.value = getValue();
