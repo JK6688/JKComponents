@@ -1,12 +1,14 @@
 import { createVNode, nextTick } from 'vue';
 import * as is from './is';
 import * as JKMath from './math';
+import { sanitizeHtml } from './sanitizeHtml';
 
 export * from './is';
 export * from './math';
 export * from './vuePropTypes';
 export * from './timeZone';
 export * from './withInstall';
+export * from './sanitizeHtml';
 
 /** 代替eval方法 */
 export function evalPro(str: string) {
@@ -96,7 +98,8 @@ export function renderHtmlStr(html: string) {
   if (!is.isString(html) || !is.isHtmlStr(html)) {
     return html;
   }
-  return createVNode('div', { innerHTML: html });
+  const innerHTML = sanitizeHtml(html);
+  return innerHTML ? createVNode('div', { innerHTML }) : innerHTML;
 }
 
 /** 获取当前网站协议+域名 */
