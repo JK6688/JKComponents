@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "0.2.28",
+  "version": "0.2.29",
   "description": "jk-vue-comps",
   "type": "module",
   "sideEffects": false,
@@ -10,44 +10,6 @@
   "files": [
     "dist"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js",
-      "default": "./dist/utils/index.js"
-    },
-    "./hooks": {
-      "types": "./dist/hooks/index.d.ts",
-      "import": "./dist/hooks/index.js",
-      "default": "./dist/hooks/index.js"
-    },
-    "./components": {
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.js",
-      "default": "./dist/components/index.js"
-    },
-    "./utils/*": {
-      "types": "./dist/utils/*.d.ts",
-      "import": "./dist/utils/*.js",
-      "default": "./dist/utils/*.js"
-    },
-    "./hooks/*": {
-      "types": "./dist/hooks/*.d.ts",
-      "import": "./dist/hooks/*.js",
-      "default": "./dist/hooks/*.js"
-    },
-    "./components/*": {
-      "types": "./dist/components/*.d.ts",
-      "import": "./dist/components/*.js",
-      "default": "./dist/components/*.js"
-    },
-    "./package.json": "./package.json"
-  },
   "keywords": [
     "vite",
     "vue3",
