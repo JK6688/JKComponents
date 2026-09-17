@@ -230,3 +230,25 @@ export function toStyleObject(style?: string | Record<string, any> | null) {
     {} as Record<string, any>
   );
 }
+
+export function openWindow(
+  url: string,
+  opt?: { target?: '_self' | '_blank' | string; noopener?: boolean; noreferrer?: boolean }
+) {
+  if (is.isServer() || !url) {
+    return;
+  }
+  const { target = '_blank', noopener = true, noreferrer = true } = opt || {};
+  const _url = String(url ?? '').trim();
+  if (!_url || !is.isHttpUrl(_url)) {
+    return;
+  }
+  const feature: string[] = [];
+  if (noopener) {
+    feature.push('noopener=yes');
+  }
+  if (noreferrer) {
+    feature.push('noreferrer=yes');
+  }
+  window.open(_url, target, feature.join(','));
+}
