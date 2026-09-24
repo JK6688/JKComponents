@@ -1,6 +1,6 @@
 {
   "name": "jk-vue-comps",
-  "version": "0.2.29",
+  "version": "0.2.30",
   "description": "jk-vue-comps",
   "type": "module",
   "sideEffects": false,
@@ -47,13 +47,13 @@
     "@types/node": "22.18.0",
     "@vitejs/plugin-vue": "6.0.9",
     "@vitejs/plugin-vue-jsx": "5.1.6",
-    "oxfmt": "^0.68.0",
-    "oxlint": "^1.83.0",
+    "oxfmt": "^0.70.0",
+    "oxlint": "^1.85.0",
     "typescript": "5.9.3",
     "vite": "8.3.0",
-    "vite-plugin-dts": "^5.1.0",
+    "vite-plugin-dts": "^5.1.1",
     "rimraf": "^6.1.3",
-    "vue": "3.5.42",
+    "vue": "3.5.43",
     "vue-tsc": "^3.3.11"
   }
 }
