@@ -318,7 +318,7 @@ const TG_LANG = {
 
 type LangKeyType = keyof typeof TG_LANG;
 
-function getLang(key: LangKeyType) {
+function toLang(key: LangKeyType) {
   return TG_LANG[key];
 }
 
@@ -357,7 +357,7 @@ export type TelegramOidcExpose = {
 
 const Telegram = defineComponent<TelegramOidcProps>({
   name: 'TelegramOidc',
-  getLang,
+  toLang,
   toAuthorization,
   getUrlParams,
   props: _comp_props,
@@ -368,7 +368,7 @@ const Telegram = defineComponent<TelegramOidcProps>({
     const authConfig = computed(() => ({
       clientId: props.clientId || 0,
       redirectUri: props.redirectUri || '',
-      lang: getLang(props.lang),
+      lang: toLang(props.lang),
       scope: getScope(props.scope),
       nonce: props.nonce
     }));
@@ -592,13 +592,13 @@ const Telegram = defineComponent<TelegramOidcProps>({
 });
 
 type C = typeof Telegram & {
-  readonly getLang: typeof getLang;
+  readonly toLang: typeof toLang;
   readonly toAuthorization: typeof toAuthorization;
   readonly getUrlParams: typeof getUrlParams;
 };
 
 /** Telegram（OIDC）身份检查 */
 export const TelegramOidc = withInstall<C>(Telegram as C) as unknown as C &
-  Plugin & { new (...args: any[]): InstanceType<C> & TelegramOidcExpose };
+  Plugin & { new(...args: any[]): InstanceType<C> & TelegramOidcExpose };
 
 export default TelegramOidc;
