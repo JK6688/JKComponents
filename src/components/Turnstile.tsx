@@ -78,9 +78,10 @@ function toLang(locale: string) {
 }
 
 const _comp_props = {
-  value: { type: String, required: true },
-  'onUpdate:value': { type: Function as PropType<(token: string) => void> },
+  value: { type: String },
   onChange: { type: Function as PropType<(token: string) => void> },
+  loading: { type: Boolean },
+  onLoadingChange: { type: Function as PropType<(loading: boolean) => void> },
   sitekey: { type: String, required: true },
   rootClass: { type: String },
   theme: { type: String as PropType<'light' | 'dark'>, required: true },
@@ -90,11 +91,15 @@ const _comp_props = {
 type RawTurnstileProps = ExtractPropTypes<typeof _comp_props>;
 
 export type TurnstileProps = Partial<RawTurnstileProps> &
-  Required<Pick<RawTurnstileProps, 'value' | 'sitekey' | 'theme' | 'lang'>>;
+  Required<Pick<RawTurnstileProps, 'sitekey' | 'theme' | 'lang'>> & {
+    'onUpdate:value'?: (token: string) => void;
+    'onUpdate:loading'?: (loading: boolean) => void;
+  };
 
 export type TurnstileExpose = {
   reset: () => void;
   destroy: () => void;
+  loading: boolean;
 };
 
 const CF = defineComponent<TurnstileProps>({
@@ -103,13 +108,18 @@ const CF = defineComponent<TurnstileProps>({
   loadScript,
   toLang,
   getTurnstile,
-  emits: { 'update:value': (_token: string) => true },
+  emits: {
+    'update:value': (_token: string) => true,
+    'update:loading': (_loading: boolean) => true,
+  },
   setup(props, { emit, expose }) {
     const DOM_ID = `turnstile-container-${useId()}`;
 
     const getIsDarkRef = computed(() => props.theme === 'dark');
 
     const widgetIdRef = ref('');
+
+    const isLoadingRef = ref(false);
 
     let isMounted = false;
     let renderVersion = 0;
@@ -118,6 +128,15 @@ const CF = defineComponent<TurnstileProps>({
       const value = token ?? '';
       props.onChange?.(value);
       emit('update:value', value);
+    }
+
+    function setLoading(loading: boolean) {
+      if (isLoadingRef.value === loading) {
+        return;
+      }
+      isLoadingRef.value = loading;
+      props.onLoadingChange?.(loading);
+      emit('update:loading', loading);
     }
 
     function reset() {
@@ -163,6 +182,8 @@ const CF = defineComponent<TurnstileProps>({
     async function initTurnstile() {
       const currentVersion = ++renderVersion;
 
+      setLoading(true);
+
       try {
         await loadScript();
 
@@ -178,6 +199,10 @@ const CF = defineComponent<TurnstileProps>({
       } catch (error) {
         if (isMounted && currentVersion === renderVersion) {
           console.error('[Turnstile] Initialization failed:', error);
+        }
+      } finally {
+        if (currentVersion === renderVersion) {
+          setLoading(false);
         }
       }
     }
@@ -205,7 +230,7 @@ const CF = defineComponent<TurnstileProps>({
       destroyTurnstile();
     });
 
-    expose({ reset, destroy: destroyTurnstile });
+    expose({ reset, destroy: destroyTurnstile, loading: isLoadingRef });
 
     return () => <div id={DOM_ID} class={props.rootClass || ''} />;
   },
