@@ -13,7 +13,16 @@ const TURNSTILE_LANG_MAP: Record<string, string> = {
   'fr-fr': 'fr-fr',
   'ms-my': 'ms-my',
   'pt-br': 'pt-br',
-  'ur-pk': 'en-us'
+  'ur-pk': 'en-us',
+  'km-kh': 'en-us',
+  'it-it': 'it-it',
+  'lo-la': 'en-us',
+  'my-mm': 'en-us',
+  'sv-se': 'sv-se',
+  'th-th': 'th-th',
+  'tl-ph': 'tl-ph',
+  'uk-ua': 'uk-ua',
+  'vi-vn': 'vi-vn'
 };
 
 type TurnstileAPI = {
@@ -84,6 +93,7 @@ const _comp_props = {
   onLoadingChange: { type: Function as PropType<(loading: boolean) => void> },
   sitekey: { type: String, required: true },
   rootClass: { type: String },
+  rootStyle: { type: [String, Object] as PropType<string | Record<string, any>> },
   theme: { type: String as PropType<'light' | 'dark'>, required: true },
   lang: { type: String, required: true }
 };
@@ -232,7 +242,7 @@ const CF = defineComponent<TurnstileProps>({
 
     expose({ reset, destroy: destroyTurnstile, loading: isLoadingRef });
 
-    return () => <div id={DOM_ID} class={props.rootClass || ''} />;
+    return () => <div id={DOM_ID} class={props.rootClass || ''} style={props.rootStyle} />;
   }
 });
 
