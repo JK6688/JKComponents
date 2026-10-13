@@ -13,7 +13,7 @@ const TURNSTILE_LANG_MAP: Record<string, string> = {
   'fr-fr': 'fr-fr',
   'ms-my': 'ms-my',
   'pt-br': 'pt-br',
-  'ur-pk': 'en-us',
+  'ur-pk': 'en-us'
 };
 
 type TurnstileAPI = {
@@ -85,7 +85,7 @@ const _comp_props = {
   sitekey: { type: String, required: true },
   rootClass: { type: String },
   theme: { type: String as PropType<'light' | 'dark'>, required: true },
-  lang: { type: String, required: true },
+  lang: { type: String, required: true }
 };
 
 type RawTurnstileProps = ExtractPropTypes<typeof _comp_props>;
@@ -110,7 +110,7 @@ const CF = defineComponent<TurnstileProps>({
   getTurnstile,
   emits: {
     'update:value': (_token: string) => true,
-    'update:loading': (_loading: boolean) => true,
+    'update:loading': (_loading: boolean) => true
   },
   setup(props, { emit, expose }) {
     const DOM_ID = `turnstile-container-${useId()}`;
@@ -174,7 +174,7 @@ const CF = defineComponent<TurnstileProps>({
           'error-callback': () => setValue(),
           'expired-callback': () => setValue(),
           'unsupported-callback': () => setValue(),
-          'timeout-callback': reset,
+          'timeout-callback': reset
         }) || ''
       );
     }
@@ -233,7 +233,7 @@ const CF = defineComponent<TurnstileProps>({
     expose({ reset, destroy: destroyTurnstile, loading: isLoadingRef });
 
     return () => <div id={DOM_ID} class={props.rootClass || ''} />;
-  },
+  }
 });
 
 type C = typeof CF & {
@@ -243,6 +243,6 @@ type C = typeof CF & {
 };
 
 export const Turnstile = withInstall<C>(CF as C) as unknown as C &
-  Plugin & { new(...args: any[]): InstanceType<C> & TurnstileExpose };
+  Plugin & { new (...args: any[]): InstanceType<C> & TurnstileExpose };
 
 export default Turnstile;

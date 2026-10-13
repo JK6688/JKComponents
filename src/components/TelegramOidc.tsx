@@ -599,6 +599,6 @@ type C = typeof Telegram & {
 
 /** Telegram（OIDC）身份检查 */
 export const TelegramOidc = withInstall<C>(Telegram as C) as unknown as C &
-  Plugin & { new(...args: any[]): InstanceType<C> & TelegramOidcExpose };
+  Plugin & { new (...args: any[]): InstanceType<C> & TelegramOidcExpose };
 
 export default TelegramOidc;
